@@ -885,6 +885,7 @@
               <label class="form-label" for="calcSalary" id="calcLabelSalary">Salary Bracket:</label>
               <select id="calcSalary" class="form-control" onchange="calculatePoints()"></select>
             </div>
+            <div id="salaryAlertAge" style="display:none; color:var(--warning); font-size:13px; font-weight:700; margin-top:8px; background:#FFFBEB; padding:8px; border:1px solid var(--warning);"></div>
           </div>
 
           <!-- 6. Research Achievements -->
@@ -2203,14 +2204,15 @@
 
       // Salary options
       const salSel = document.getElementById("calcSalary");
+      const curSal = salSel.value;
       salSel.innerHTML = "";
       if (cat === "1a" || cat === "1b") {
         salSel.innerHTML = isId ? `
           <option value="disqualify">Di bawah ¥3.000.000</option>
           <option value="0" selected>¥3.000.000 hingga kurang dari ¥4.000.000</option>
           <option value="10">¥4.000.000 hingga kurang dari ¥5.000.000 (10 poin - hanya usia &lt;30 thn)</option>
-          <option value="15">¥5.000.000 hingga kurang dari ¥6.000.000 (15 poin - hanya usia &lt;30 thn)</option>
-          <option value="20">¥6.000.000 hingga kurang dari ¥7.000.000 (20 poin - hanya usia &lt;35 thn)</option>
+          <option value="15">¥5.000.000 hingga kurang dari ¥6.000.000 (15 poin - hanya usia &lt;35 thn)</option>
+          <option value="20">¥6.000.000 hingga kurang dari ¥7.000.000 (20 poin - hanya usia &lt;40 thn)</option>
           <option value="25">¥7.000.000 hingga kurang dari ¥8.000.000 (25 poin - hanya usia &lt;40 thn)</option>
           <option value="30">¥8.000.000 hingga kurang dari ¥9.000.000 (30 poin)</option>
           <option value="35">¥9.000.000 hingga kurang dari ¥10.000.000 (35 poin)</option>
@@ -2219,8 +2221,8 @@
           <option value="disqualify">Under ¥3,000,000</option>
           <option value="0" selected>¥3,000,000 to less than ¥4,000,000</option>
           <option value="10">¥4,000,000 to less than ¥5,000,000 (10 pts - &lt;30 yrs old only)</option>
-          <option value="15">¥5,000,000 to less than ¥6,000,000 (15 pts - &lt;30 yrs old only)</option>
-          <option value="20">¥6,000,000 to less than ¥7,000,000 (20 pts - &lt;35 yrs old only)</option>
+          <option value="15">¥5,000,000 to less than ¥6,000,000 (15 pts - &lt;35 yrs old only)</option>
+          <option value="20">¥6,000,000 to less than ¥7,000,000 (20 pts - &lt;40 yrs old only)</option>
           <option value="25">¥7,000,000 to less than ¥8,000,000 (25 pts - &lt;40 yrs old only)</option>
           <option value="30">¥8,000,000 to less than ¥9,000,000 (30 pts)</option>
           <option value="35">¥9,000,000 to less than ¥10,000,000 (35 pts)</option>
@@ -2245,6 +2247,7 @@
           <option value="50">¥30,000,000 or more (50 pts)</option>
         `;
       }
+      if (curSal) salSel.value = curSal;
 
       // Exclusive controls visibility
       document.getElementById("secLicenses1b").style.display = (cat === "1b") ? "block" : "none";
@@ -2298,19 +2301,47 @@
       const salVal = document.getElementById("calcSalary").value;
       let pSalary = 0;
       const salAlert = document.getElementById("salaryAlertMin");
+      const salAlertAge = document.getElementById("salaryAlertAge");
 
       if (salVal === "disqualify") {
-        salAlert.style.display = "block";
+        if (salAlert) salAlert.style.display = "block";
+        if (salAlertAge) salAlertAge.style.display = "none";
         pSalary = 0;
       } else {
-        salAlert.style.display = "none";
+        if (salAlert) salAlert.style.display = "none";
         pSalary = +salVal || 0;
+        let ageMismatchMsg = "";
         if (cat === "1a" || cat === "1b") {
           const agePoints = +document.getElementById("calcAge").value;
-          if (pSalary === 25 && agePoints === 0) pSalary = 0;
-          if (pSalary === 20 && agePoints < 10) pSalary = 0;
-          if (pSalary === 15 && agePoints < 15) pSalary = 0;
-          if (pSalary === 10 && agePoints < 15) pSalary = 0;
+          if (pSalary === 25 && agePoints < 5) {
+            pSalary = 0;
+            ageMismatchMsg = isId ? 
+              "Peringatan Batas Usia: Rentang gaji ¥7.000.000 – ¥8.000.000 (25 poin) memerlukan usia di bawah 40 tahun (0 poin untuk usia 40+)." :
+              "Age Restriction Notice: The ¥7,000,000 – ¥8,000,000 bracket (25 pts) requires age under 40 (0 pts for age 40+).";
+          } else if (pSalary === 20 && agePoints < 5) {
+            pSalary = 0;
+            ageMismatchMsg = isId ? 
+              "Peringatan Batas Usia: Rentang gaji ¥6.000.000 – ¥7.000.000 (20 poin) memerlukan usia di bawah 40 tahun (0 poin untuk usia 40+)." :
+              "Age Restriction Notice: The ¥6,000,000 – ¥7,000,000 bracket (20 pts) requires age under 40 (0 pts for age 40+).";
+          } else if (pSalary === 15 && agePoints < 10) {
+            pSalary = 0;
+            ageMismatchMsg = isId ? 
+              "Peringatan Batas Usia: Rentang gaji ¥5.000.000 – ¥6.000.000 (15 poin) memerlukan usia di bawah 35 tahun (0 poin untuk usia 35+)." :
+              "Age Restriction Notice: The ¥5,000,000 – ¥6,000,000 bracket (15 pts) requires age under 35 (0 pts for age 35+).";
+          } else if (pSalary === 10 && agePoints < 15) {
+            pSalary = 0;
+            ageMismatchMsg = isId ? 
+              "Peringatan Batas Usia: Rentang gaji ¥4.000.000 – ¥5.000.000 (10 poin) memerlukan usia di bawah 30 tahun (0 poin untuk usia 30+)." :
+              "Age Restriction Notice: The ¥4,000,000 – ¥5,000,000 bracket (10 pts) requires age under 30 (0 pts for age 30+).";
+          }
+        }
+        if (salAlertAge) {
+          if (ageMismatchMsg) {
+            salAlertAge.style.display = "block";
+            salAlertAge.textContent = ageMismatchMsg;
+          } else {
+            salAlertAge.style.display = "none";
+          }
         }
       }
 

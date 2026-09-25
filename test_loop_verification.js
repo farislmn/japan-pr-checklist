@@ -195,8 +195,24 @@ vm.runInContext(`
   getEl("calcSalary").value = "25"; // 7-8M requires <40
   calculatePoints();
   salaryPointsDiscounted = +getEl("subSalary").textContent;
+  ageNotice40 = getEl("salaryAlertAge").textContent;
+
+  // Case 6b: Age 35-39 (agePoints = 5) with ¥6M (20 pts) -> eligible (<40) -> 20 pts
+  getEl("calcAge").value = "5"; // 35-39
+  getEl("calcSalary").value = "20"; // 6-7M
+  calculatePoints();
+  salaryPoints35to39 = +getEl("subSalary").textContent;
+
+  // Case 6c: Age 30-34 (agePoints = 10) with ¥5M (15 pts) -> eligible (<35) -> 15 pts
+  getEl("calcAge").value = "10"; // 30-34
+  getEl("calcSalary").value = "15"; // 5-6M
+  calculatePoints();
+  salaryPoints30to34 = +getEl("subSalary").textContent;
 `, ctx);
 assert(sandbox.salaryPointsDiscounted === 0, "1(b) Salary Age Gating at 40+", `Expected 0, got ${sandbox.salaryPointsDiscounted}`);
+assert(sandbox.ageNotice40.includes("Age Restriction Notice"), "1(b) Age Restriction notice shown at 40+", sandbox.ageNotice40);
+assert(sandbox.salaryPoints35to39 === 20, "1(b) Salary ¥6M eligible for 35-39 (20 pts)", `Expected 20, got ${sandbox.salaryPoints35to39}`);
+assert(sandbox.salaryPoints30to34 === 15, "1(b) Salary ¥5M eligible for 30-34 (15 pts)", `Expected 15, got ${sandbox.salaryPoints30to34}`);
 
 // TEST 7: Category 1(c) Zero-Age Points & Executive Status
 vm.runInContext(`
