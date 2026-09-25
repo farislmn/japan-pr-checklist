@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 
 # Load data
-data_path = Path('pr_data.json') if Path('pr_data.json').exists() else Path('generic/pr_data.json')
+data_path = Path(__file__).resolve().parent / 'pr_data.json'
 with open(data_path, 'r', encoding='utf-8') as f:
     pr_data = json.load(f)
 
@@ -111,6 +111,8 @@ html_content = f'''<!DOCTYPE html>
       gap: 8px;
     }}
     .route-select {{
+      max-width: 100%;
+      min-width: 0;
       font-family: "Times New Roman", Times, serif;
       font-size: 14px;
       font-weight: 700;
@@ -315,8 +317,12 @@ html_content = f'''<!DOCTYPE html>
     }}
     .item-ref {{
       display: inline-block;
+      font-family: inherit;
       font-size: 12px;
       color: var(--link);
+      background: none;
+      border: none;
+      padding: 0;
       cursor: pointer;
       text-decoration: underline;
     }}
@@ -401,6 +407,14 @@ html_content = f'''<!DOCTYPE html>
     @media (max-width: 850px) {{
       .calc-grid {{ grid-template-columns: 1fr; }}
       .check-item {{ grid-template-columns: 1fr; gap: 8px; }}
+    }}
+    @media (max-width: 640px) {{
+      .home-table, .home-table tbody, .home-table tr, .home-table td {{
+        display: block;
+        width: 100% !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+      }}
     }}
 
     /* Sticky Score Summary Card (Square, 0px radius) */
@@ -571,7 +585,7 @@ html_content = f'''<!DOCTYPE html>
       <div class="header-links-row" id="headerLinksRow" style="display:none;">
         <div>
           <a href="https://docs.google.com/spreadsheets/d/13N2LT5IpfbvnOTPR4XX7PkV_vJbcW9rG7C-oqCKUC-8/edit?usp=sharing" target="_blank" rel="noopener noreferrer" style="font-weight: 700;" id="headerDownloadExcel">
-            Download Master Diagnostic Checklist (.xlsx)
+            Open Master Diagnostic Checklist (Google Sheets)
           </a>
         </div>
 
@@ -601,7 +615,7 @@ html_content = f'''<!DOCTYPE html>
     <!-- ========================================================================= -->
     <div id="tab-home" class="tab-pane active">
       <div style="margin: 20px 0 30px 0;">
-        <table border="0" cellspacing="0" cellpadding="0" style="width: 100%; border: none; background: transparent;">
+        <table class="home-table" border="0" cellspacing="0" cellpadding="0" style="width: 100%; border: none; background: transparent;">
           <tbody>
             <tr>
               <td style="width: 50%; vertical-align: top; padding-right: 25px;">
@@ -626,10 +640,10 @@ html_content = f'''<!DOCTYPE html>
 
                   <li style="margin-bottom: 24px;">
                     <a href="https://docs.google.com/spreadsheets/d/13N2LT5IpfbvnOTPR4XX7PkV_vJbcW9rG7C-oqCKUC-8/edit?usp=sharing" target="_blank" rel="noopener noreferrer" style="font-size: 18px; font-weight: 700;" id="homeTitleDownload">
-                      Download Master Diagnostic Checklist (.xlsx)
+                      Open Master Diagnostic Checklist (Google Sheets)
                     </a>
                     <div style="font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-top: 2px;" id="homeDescDownload">
-                      Download the complete checklist and reference guide as an Excel spreadsheet for offline use.
+                      The complete checklist and reference guide as a Google Sheets spreadsheet. Opens an external site; use File → Download to save a copy. Nothing you enter in this tool is sent.
                     </div>
                   </li>
                 </ul>
@@ -681,7 +695,7 @@ html_content = f'''<!DOCTYPE html>
       <!-- Route Selector Box -->
       <div class="card" style="margin-bottom:12px; padding:12px 16px; background:var(--surface);">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-          <div style="display:flex; align-items:center; gap:10px;">
+          <div style="display:flex; align-items:center; flex-wrap:wrap; gap:10px; min-width:0; max-width:100%;">
             <label for="routeSelect" id="chkRouteLabel" style="font-weight:700; font-size:16px;">Application Route:</label>
             <select id="routeSelect" class="route-select" style="font-size:16px; padding:4px 8px; border:1px solid var(--border);" onchange="switchRoute(this.value)">
               <!-- Populated dynamically -->
@@ -738,7 +752,7 @@ html_content = f'''<!DOCTYPE html>
       <!-- Route Selector Box & Print Action -->
       <div class="card" style="margin-bottom:12px; padding:12px 16px; background:var(--surface);">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-          <div style="display:flex; align-items:center; gap:10px;">
+          <div style="display:flex; align-items:center; flex-wrap:wrap; gap:10px; min-width:0; max-width:100%;">
             <label for="routeSelectAssembly" id="asmRouteLabel" style="font-weight:700; font-size:16px;">Application Route:</label>
             <select id="routeSelectAssembly" class="route-select" style="font-size:16px; padding:4px 8px; border:1px solid var(--border);" onchange="switchRoute(this.value)">
               <!-- Populated dynamically -->
@@ -811,15 +825,8 @@ html_content = f'''<!DOCTYPE html>
         <div class="calc-form">
           <!-- 1. Category Selector -->
           <div class="card">
-            <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:10px;">
-              <div>
-                <div class="card-title" id="calcCatCardTitle">Highly Skilled Professional Category (高度専門職の種別)</div>
-                <div class="card-subtitle" id="calcCatCardSubtitle">Select your professional category to calculate points and check eligibility</div>
-              </div>
-              <div>
-                <button class="btn" id="calcBtnResetTop" onclick="resetCalculator()">Reset</button>
-              </div>
-            </div>
+            <div class="card-title" id="calcCatCardTitle">Highly Skilled Professional Category (高度専門職の種別)</div>
+            <div class="card-subtitle" id="calcCatCardSubtitle">Select your professional category to calculate points and check eligibility</div>
 
             <div class="form-group">
               <label class="form-label" for="calcCategory" id="calcLabelCatSelect">Select Category:</label>
@@ -1049,18 +1056,20 @@ html_content = f'''<!DOCTYPE html>
 
             <div style="font-size:13px; font-weight:700; margin-bottom:6px;" id="calcDualAuditTitle">Dual-Timestamp Continuous Audit:</div>
             <div style="font-size:12px; color:var(--text-muted); margin-bottom:10px;" id="calcDualAuditDesc">
-              Prove 80+ or 70+ was held at <b>both</b> filing date and 1-yr / 3-yr prior benchmark.
+              80-point route: 80+ at the filing date <b>and</b> 1 year before. 70-point route: 70+ at the filing date <b>and</b> 3 years before.
             </div>
 
             <div style="display:flex; flex-direction:column; gap:6px;">
               <button class="btn btn-primary" id="btnLockFiling" onclick="saveFilingDateScore()">Lock as Current Filing Date Score</button>
-              <button class="btn" id="btnLockPrior" onclick="savePriorDateScore()">Lock as 1/3-Year Prior Score</button>
+              <button class="btn" id="btnLockPrior1" onclick="savePriorDateScore(1)">Lock as 1-Year Prior Score</button>
+              <button class="btn" id="btnLockPrior3" onclick="savePriorDateScore(3)">Lock as 3-Year Prior Score</button>
               <button class="btn" id="btnResetCalcSide" onclick="resetCalculator()" style="margin-top:4px;">Reset Calculator</button>
             </div>
 
             <div id="dualAuditCard" style="margin-top:12px; font-size:12px; background:#FFFFFF; border:1px solid var(--border); padding:8px;">
               <div><span id="lblDualFiling">Filing Date:</span> <b id="dualFiling">-</b></div>
-              <div><span id="lblDualPrior">Retroactive Date:</span> <b id="dualPrior">-</b></div>
+              <div><span id="lblDualPrior1">1 Year Before:</span> <b id="dualPrior1">-</b></div>
+              <div><span id="lblDualPrior3">3 Years Before:</span> <b id="dualPrior3">-</b></div>
               <div id="dualVerdict" style="margin-top:4px; font-weight:700;"></div>
             </div>
           </div>
@@ -1104,11 +1113,12 @@ html_content = f'''<!DOCTYPE html>
             <div class="form-group">
               <label class="form-label" for="simBenchmark" id="labelSimBenchmark">Benchmark Survey Statistic:</label>
               <select id="simBenchmark" class="form-control" onchange="runReformSimulation()">
-                <option value="kiso_all" selected>MHLW National Life Basic Survey: All Households Mean (¥5,752,000) [Default]</option>
-                <option value="kiso_median">MHLW National Life Basic Survey: Median (¥4,510,000)</option>
-                <option value="kiso_nonelderly">MHLW Comprehensive Survey: Non-Elderly Households (¥7,007,000)</option>
-                <option value="kiso_children">MHLW Comprehensive Survey: Households with Children (¥8,573,000)</option>
-                <option value="nta_wage">National Tax Agency: Average Salaried Wage (¥4,780,000)</option>
+                <option value="by_size" selected>By household size: MHLW average income for households of your size [Default]</option>
+                <option value="kiso_all">Flat: MHLW All Households Mean (¥5,752,000)</option>
+                <option value="kiso_median">Flat: MHLW Median (¥4,510,000)</option>
+                <option value="kiso_nonelderly">Flat: MHLW Non-Elderly Households (¥7,007,000)</option>
+                <option value="kiso_children">Flat: MHLW Households with Children (¥8,573,000)</option>
+                <option value="nta_wage">Flat: National Tax Agency Average Salaried Wage (¥4,780,000)</option>
               </select>
             </div>
 
@@ -1120,7 +1130,7 @@ html_content = f'''<!DOCTYPE html>
               <div class="form-group">
                 <label class="form-label" for="simHhAbroad" id="labelSimHhAbroad">Overseas Dependents (海外扶養):</label>
                 <input type="number" id="simHhAbroad" class="form-control" value="0" min="0" max="10" onchange="runReformSimulation()">
-                <div class="form-desc" id="descSimHhAbroad">Counted in household size per draft</div>
+                <div class="form-desc" id="descSimHhAbroad">Added to household size (enter people living with you in Household Size)</div>
               </div>
             </div>
 
@@ -1405,10 +1415,16 @@ html_content = f'''<!DOCTYPE html>
     let currentLang = "en"; // Default to English for test compatibility and baseline
     let currentRoute = "10-Year Standard Route";
     let checklistAnswers = {{}};
-    let checklistNotes = {{}};
     let activeFilter = "all";
     let lockedFilingScore = null;
-    let lockedPriorScore = null;
+    let lockedPrior1Score = null;
+    let lockedPrior3Score = null;
+    let savedCalcInputs = null;
+    let lastCalcCategory = null;
+
+    const CALC_SELECT_IDS = ["calcDegree", "calcExperience", "calcAge", "calcSalary", "calcLicenses1b", "calcPosition1c", "calcInnovation", "calcJapanese"];
+    const CALC_CHECKBOX_IDS = ["calcMultiDegree", "resPatent", "resGrant", "resPapers", "resMoj", "calcInvest100M", "calcInvManagement", "calcSmeRd", "calcForeignQual", "calcJapanUni", "calcGrowthField", "calcTopUni", "calcJica", "calcLocalGov"];
+    const CALC_CATEGORIES = ["1a", "1b", "1c", "jskip"];
 
     function setLanguage(lang) {{
       currentLang = lang;
@@ -1455,7 +1471,7 @@ html_content = f'''<!DOCTYPE html>
 
       // Header links
       const dlExcel = document.getElementById("headerDownloadExcel");
-      if (dlExcel) dlExcel.textContent = isId ? "Unduh Master Daftar Periksa Diagnostik (.xlsx)" : "Download Master Diagnostic Checklist (.xlsx)";
+      if (dlExcel) dlExcel.textContent = isId ? "Buka Master Daftar Periksa Diagnostik (Google Sheets)" : "Open Master Diagnostic Checklist (Google Sheets)";
       const btnSave = document.getElementById("btnSaveDisk");
       if (btnSave) btnSave.textContent = isId ? "Simpan ke disk" : "Save to disk";
       const btnLoad = document.getElementById("btnLoadDisk");
@@ -1481,8 +1497,8 @@ html_content = f'''<!DOCTYPE html>
       const hTitleSimulator = document.getElementById("homeTitleSimulator"); if (hTitleSimulator) hTitleSimulator.textContent = isId ? "Penilaian Pedoman PR Revisi (Standar Pensiun Publik & Standar Penghidupan)" : "Revised PR Guidelines Assessment (Public Pension & Livelihood Standards)";
       const hDescSimulator = document.getElementById("homeDescSimulator"); if (hDescSimulator) hDescSimulator.textContent = isId ? "Uji pendapatan rumah tangga dan proyeksi pensiun Anda terhadap rancangan aturan izin tinggal tetap (PR) Jepang yang baru." : "Test your household income and projected pension against Japan's proposed permanent residency rules.";
 
-      const hTitleDownload = document.getElementById("homeTitleDownload"); if (hTitleDownload) hTitleDownload.textContent = isId ? "Unduh Master Daftar Periksa Diagnostik (.xlsx)" : "Download Master Diagnostic Checklist (.xlsx)";
-      const hDescDownload = document.getElementById("homeDescDownload"); if (hDescDownload) hDescDownload.textContent = isId ? "Unduh daftar periksa lengkap dan panduan referensi dalam format spreadsheet Excel untuk penggunaan offline." : "Download the complete checklist and reference guide as an Excel spreadsheet for offline use.";
+      const hTitleDownload = document.getElementById("homeTitleDownload"); if (hTitleDownload) hTitleDownload.textContent = isId ? "Buka Master Daftar Periksa Diagnostik (Google Sheets)" : "Open Master Diagnostic Checklist (Google Sheets)";
+      const hDescDownload = document.getElementById("homeDescDownload"); if (hDescDownload) hDescDownload.textContent = isId ? "Daftar periksa lengkap dan panduan referensi dalam spreadsheet Google Sheets. Membuka situs eksternal; gunakan File → Download untuk menyimpan salinan. Data yang Anda masukkan di alat ini tidak dikirim." : "The complete checklist and reference guide as a Google Sheets spreadsheet. Opens an external site; use File → Download to save a copy. Nothing you enter in this tool is sent.";
 
       const hFooterNote = document.getElementById("homeFooterNote"); if (hFooterNote) hFooterNote.textContent = isId ? "Aplikasi ini beroperasi 100% secara lokal dan offline di peramban web Anda. Tidak ada data diagnostik atau angka keuangan yang dikirimkan ke server mana pun." : "This application operates 100% locally and offline in your web browser. No diagnostic data or financial figures are transmitted to any server.";
       const hFooterLink = document.getElementById("homeFooterLink"); if (hFooterLink) hFooterLink.textContent = isId ? "Referensi Hukum, Kerangka Peraturan & Penafian (Disclaimer)" : "Legal References, Statutory Framework & Disclaimer";
@@ -1514,7 +1530,6 @@ html_content = f'''<!DOCTYPE html>
       // Calculator Tab Static Elements
       const calcCatTitle = document.getElementById("calcCatCardTitle"); if (calcCatTitle) calcCatTitle.textContent = isId ? "Kategori Tenaga Kerja Ahli Tingkat Lanjut / HSP (高度専門職の種別)" : "Highly Skilled Professional Category (高度専門職の種別)";
       const calcCatSub = document.getElementById("calcCatCardSubtitle"); if (calcCatSub) calcCatSub.textContent = isId ? "Pilih kategori profesi Anda untuk menghitung poin dan memeriksa kelayakan" : "Select your professional category to calculate points and check eligibility";
-      const calcResetTop = document.getElementById("calcBtnResetTop"); if (calcResetTop) calcResetTop.textContent = isId ? "Atur Ulang" : "Reset";
       const calcLblCatSel = document.getElementById("calcLabelCatSelect"); if (calcLblCatSel) calcLblCatSel.textContent = isId ? "Pilih Kategori:" : "Select Category:";
 
       const jskipPTitle = document.getElementById("calcJskipPanelTitle"); if (jskipPTitle) jskipPTitle.textContent = isId ? "Kelayakan Jalur Cepat 1 Tahun J-Skip (特別高度人材)" : "J-Skip (特別高度人材) 1-Year Fast Track Eligibility";
@@ -1590,36 +1605,12 @@ html_content = f'''<!DOCTYPE html>
       const lblSubTot = document.getElementById("lblSubTotal"); if (lblSubTot) lblSubTot.textContent = isId ? "Total Skor:" : "Total Score:";
 
       const dualTitle = document.getElementById("calcDualAuditTitle"); if (dualTitle) dualTitle.textContent = isId ? "Audit Kontinu Dua Titik Waktu:" : "Dual-Timestamp Continuous Audit:";
-      const dualDesc = document.getElementById("calcDualAuditDesc"); if (dualDesc) dualDesc.innerHTML = isId ? "Buktikan bahwa 80+ atau 70+ poin terpenuhi pada <b>kedua</b> tanggal: tanggal pengajuan dan titik patokan 1 tahun / 3 tahun sebelumnya." : "Prove 80+ or 70+ was held at <b>both</b> filing date and 1-yr / 3-yr prior benchmark.";
-      const btnLockF = document.getElementById("btnLockFiling");
-      if (btnLockF) {{
-        if (lockedFilingScore !== null) {{
-          btnLockF.textContent = isId ? "Buka Kunci Skor Tanggal Pengajuan Saat Ini" : "Unlock the Current Filing Date Score";
-        }} else {{
-          btnLockF.textContent = isId ? "Kunci Skor Tanggal Pengajuan Saat Ini" : "Lock as Current Filing Date Score";
-        }}
-      }}
-      const btnLockP = document.getElementById("btnLockPrior");
-      if (btnLockP) {{
-        if (lockedPriorScore !== null) {{
-          btnLockP.textContent = isId ? "Buka Kunci Skor 1/3 Tahun Sebelumnya" : "Unlock the 1/3-Year Prior Score";
-        }} else {{
-          btnLockP.textContent = isId ? "Kunci Skor 1/3 Tahun Sebelumnya" : "Lock as 1/3-Year Prior Score";
-        }}
-      }}
+      const dualDesc = document.getElementById("calcDualAuditDesc"); if (dualDesc) dualDesc.innerHTML = isId ? "Jalur 80 poin: 80+ pada tanggal pengajuan <b>dan</b> 1 tahun sebelumnya. Jalur 70 poin: 70+ pada tanggal pengajuan <b>dan</b> 3 tahun sebelumnya." : "80-point route: 80+ at the filing date <b>and</b> 1 year before. 70-point route: 70+ at the filing date <b>and</b> 3 years before.";
       const btnResetSide = document.getElementById("btnResetCalcSide"); if (btnResetSide) btnResetSide.textContent = isId ? "Atur Ulang Kalkulator" : "Reset Calculator";
       const lblDualF = document.getElementById("lblDualFiling"); if (lblDualF) lblDualF.textContent = isId ? "Tanggal Pengajuan:" : "Filing Date:";
-      const lblDualP = document.getElementById("lblDualPrior"); if (lblDualP) lblDualP.textContent = isId ? "Tanggal Retroaktif:" : "Retroactive Date:";
-
-      const dF = document.getElementById("dualFiling");
-      if (dF) {{
-        dF.textContent = (lockedFilingScore !== null) ? `${{lockedFilingScore}} ${{isId ? 'poin' : 'points'}}` : "-";
-      }}
-      const dP = document.getElementById("dualPrior");
-      if (dP) {{
-        dP.textContent = (lockedPriorScore !== null) ? `${{lockedPriorScore}} ${{isId ? 'poin' : 'points'}}` : "-";
-      }}
-      evaluateDualScores();
+      const lblDualP1 = document.getElementById("lblDualPrior1"); if (lblDualP1) lblDualP1.textContent = isId ? "1 Tahun Sebelumnya:" : "1 Year Before:";
+      const lblDualP3 = document.getElementById("lblDualPrior3"); if (lblDualP3) lblDualP3.textContent = isId ? "3 Tahun Sebelumnya:" : "3 Years Before:";
+      renderDualAudit();
 
       const calcFooterNote = document.getElementById("calcFooterNote"); if (calcFooterNote) calcFooterNote.textContent = isId ? "Alat ini beroperasi 100% secara lokal dan offline di peramban Anda untuk penilaian mandiri pribadi. Alat ini tidak memberikan nasihat hukum atau menjamin hasil permohonan." : "This tool operates 100% locally and offline in your browser for personal self-assessment. It does not provide legal advice or guarantee application outcomes.";
       const calcFooterLink = document.getElementById("calcFooterLink"); if (calcFooterLink) calcFooterLink.textContent = isId ? "Referensi Hukum & Penafian Hukum" : "Legal References & Statutory Disclaimer";
@@ -1631,9 +1622,29 @@ html_content = f'''<!DOCTYPE html>
       const simTitleInc = document.getElementById("simTitleIncomeStd"); if (simTitleInc) simTitleInc.textContent = isId ? "Standar Pendapatan Rumah Tangga" : "Household Income Standard";
       const simSubInc = document.getElementById("simSubIncomeStd"); if (simSubInc) simSubInc.textContent = isId ? "Harus terus memenuhi atau melebihi pendapatan rata-rata rumah tangga Jepang berdasarkan jumlah anggota keluarga" : "Must continuously meet or exceed the average income of Japanese households by household size";
       const lblBench = document.getElementById("labelSimBenchmark"); if (lblBench) lblBench.textContent = isId ? "Statistik Tolok Ukur Survei:" : "Benchmark Survey Statistic:";
+      const benchSel = document.getElementById("simBenchmark");
+      if (benchSel) {{
+        const curBench = benchSel.value;
+        benchSel.innerHTML = isId ? `
+          <option value="by_size">Berdasarkan jumlah anggota rumah tangga: rata-rata pendapatan MHLW untuk rumah tangga seukuran Anda [Bawaan]</option>
+          <option value="kiso_all">Tetap: Rata-rata Semua Rumah Tangga MHLW (¥5.752.000)</option>
+          <option value="kiso_median">Tetap: Median MHLW (¥4.510.000)</option>
+          <option value="kiso_nonelderly">Tetap: Rumah Tangga Non-Lansia MHLW (¥7.007.000)</option>
+          <option value="kiso_children">Tetap: Rumah Tangga dengan Anak MHLW (¥8.573.000)</option>
+          <option value="nta_wage">Tetap: Rata-rata Upah Karyawan Badan Pajak Nasional (¥4.780.000)</option>
+        ` : `
+          <option value="by_size">By household size: MHLW average income for households of your size [Default]</option>
+          <option value="kiso_all">Flat: MHLW All Households Mean (¥5,752,000)</option>
+          <option value="kiso_median">Flat: MHLW Median (¥4,510,000)</option>
+          <option value="kiso_nonelderly">Flat: MHLW Non-Elderly Households (¥7,007,000)</option>
+          <option value="kiso_children">Flat: MHLW Households with Children (¥8,573,000)</option>
+          <option value="nta_wage">Flat: National Tax Agency Average Salaried Wage (¥4,780,000)</option>
+        `;
+        setSelectValue(benchSel, curBench || "by_size");
+      }}
       const lblHhSize = document.getElementById("labelSimHhSize"); if (lblHhSize) lblHhSize.textContent = isId ? "Jumlah Anggota Rumah Tangga (世帯人数):" : "Household Size (世帯人数):";
       const lblHhAbroad = document.getElementById("labelSimHhAbroad"); if (lblHhAbroad) lblHhAbroad.textContent = isId ? "Tanggungan Luar Negeri (海外扶養):" : "Overseas Dependents (海外扶養):";
-      const descHhAbroad = document.getElementById("descSimHhAbroad"); if (descHhAbroad) descHhAbroad.textContent = isId ? "Dihitung dalam jumlah anggota keluarga sesuai rancangan aturan" : "Counted in household size per draft";
+      const descHhAbroad = document.getElementById("descSimHhAbroad"); if (descHhAbroad) descHhAbroad.textContent = isId ? "Ditambahkan ke jumlah anggota rumah tangga (isi orang yang tinggal bersama Anda di Jumlah Anggota Rumah Tangga)" : "Added to household size (enter people living with you in Household Size)";
       const lblInc = document.getElementById("labelSimIncome"); if (lblInc) lblInc.textContent = isId ? "Pendapatan Kotor Pemohon (本人年収・万円):" : "Applicant Gross Income (本人年収・万円):";
       const lblSpouseInc = document.getElementById("labelSimSpouseIncome"); if (lblSpouseInc) lblSpouseInc.textContent = isId ? "Pendapatan Kotor Pasangan (配偶者年収・万円):" : "Spouse Gross Income (配偶者年収・万円):";
       const descSpouseInc = document.getElementById("descSimSpouseIncome"); if (descSpouseInc) descSpouseInc.textContent = isId ? "Diizinkan jika memiliki izin kerja" : "Permitted if work-authorized";
@@ -1679,35 +1690,96 @@ html_content = f'''<!DOCTYPE html>
       const discRetLink = document.getElementById("discReturnLink"); if (discRetLink) discRetLink.innerHTML = isId ? "&larr; Kembali ke Beranda" : "&larr; Return to Home";
     }}
 
+    // Validates a saved or imported state object and applies only well-formed fields.
+    // Returns false if the object is not a usable backup.
+    function applyState(parsed) {{
+      if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return false;
+      const isScore = v => v === null || (typeof v === "number" && isFinite(v) && v >= 0);
+      if (parsed.currentLang === "en" || parsed.currentLang === "id") currentLang = parsed.currentLang;
+      if (typeof parsed.currentRoute === "string" && ROUTE_ITEMS[parsed.currentRoute]) currentRoute = parsed.currentRoute;
+      if (parsed.checklistAnswers && typeof parsed.checklistAnswers === "object") {{
+        const clean = {{}};
+        Object.keys(parsed.checklistAnswers).forEach(route => {{
+          if (!ROUTE_ITEMS[route]) return;
+          const answers = parsed.checklistAnswers[route] || {{}};
+          const validNums = new Set(ROUTE_ITEMS[route].map(it => String(it.num)));
+          clean[route] = {{}};
+          Object.keys(answers).forEach(num => {{
+            if (validNums.has(num) && ["YES", "NO", "N/A"].includes(answers[num])) clean[route][num] = answers[num];
+          }});
+        }});
+        checklistAnswers = clean;
+      }}
+      if (isScore(parsed.lockedFilingScore)) lockedFilingScore = parsed.lockedFilingScore;
+      if (isScore(parsed.lockedPrior1Score)) lockedPrior1Score = parsed.lockedPrior1Score;
+      if (isScore(parsed.lockedPrior3Score)) lockedPrior3Score = parsed.lockedPrior3Score;
+      if (parsed.calcInputs && typeof parsed.calcInputs === "object") savedCalcInputs = parsed.calcInputs;
+      return true;
+    }}
+
     function loadSavedState() {{
       try {{
         const saved = localStorage.getItem("japan_pr_state");
-        if (saved) {{
-          const parsed = JSON.parse(saved);
-          if (parsed.currentLang) currentLang = parsed.currentLang;
-          if (parsed.currentRoute) currentRoute = parsed.currentRoute;
-          if (parsed.checklistAnswers) checklistAnswers = parsed.checklistAnswers;
-          if (parsed.checklistNotes) checklistNotes = parsed.checklistNotes;
-          if (parsed.lockedFilingScore !== undefined) lockedFilingScore = parsed.lockedFilingScore;
-          if (parsed.lockedPriorScore !== undefined) lockedPriorScore = parsed.lockedPriorScore;
-        }}
+        if (saved) applyState(JSON.parse(saved));
       }} catch(e) {{
         console.warn("Failed to load localStorage:", e);
       }}
     }}
 
+    function collectCalcInputs() {{
+      const catEl = document.getElementById("calcCategory");
+      if (!catEl) return null;
+      const inputs = {{ category: catEl.value, selects: {{}}, checks: {{}}, jskipTrack: "none" }};
+      CALC_SELECT_IDS.forEach(id => {{ const el = document.getElementById(id); if (el) inputs.selects[id] = el.value; }});
+      CALC_CHECKBOX_IDS.forEach(id => {{ const el = document.getElementById(id); if (el) inputs.checks[id] = !!el.checked; }});
+      const track = document.querySelector('input[name="jskip_track"]:checked');
+      if (track) inputs.jskipTrack = track.value;
+      return inputs;
+    }}
+
+    // Sets a <select> value, falling back to its first option when the value is not offered.
+    function setSelectValue(sel, value) {{
+      if (!sel || value === undefined || value === null || value === "") return;
+      sel.value = value;
+      if (sel.selectedIndex === -1 && sel.options && sel.options.length) sel.selectedIndex = 0;
+    }}
+
+    function restoreCalcInputs(inputs) {{
+      if (!inputs || typeof inputs !== "object") return;
+      const catEl = document.getElementById("calcCategory");
+      if (!catEl) return;
+      catEl.value = CALC_CATEGORIES.includes(inputs.category) ? inputs.category : "1b";
+      handleCategoryChange();
+      const selects = inputs.selects || {{}};
+      CALC_SELECT_IDS.forEach(id => {{
+        if (typeof selects[id] === "string") setSelectValue(document.getElementById(id), selects[id]);
+      }});
+      const checks = inputs.checks || {{}};
+      CALC_CHECKBOX_IDS.forEach(id => {{
+        const el = document.getElementById(id);
+        if (el && typeof checks[id] === "boolean") el.checked = checks[id];
+      }});
+      const trackEl = document.getElementById("jskip_" + (["t1", "t2"].includes(inputs.jskipTrack) ? inputs.jskipTrack : "none"));
+      if (trackEl) trackEl.checked = true;
+      handleInnovationChange();
+    }}
+
+    function buildStatePayload() {{
+      return {{
+        currentLang,
+        currentRoute,
+        checklistAnswers,
+        lockedFilingScore,
+        lockedPrior1Score,
+        lockedPrior3Score,
+        calcInputs: collectCalcInputs() || savedCalcInputs,
+        updatedAt: new Date().toISOString()
+      }};
+    }}
+
     function saveState() {{
       try {{
-        const payload = {{
-          currentLang,
-          currentRoute,
-          checklistAnswers,
-          checklistNotes,
-          lockedFilingScore,
-          lockedPriorScore,
-          updatedAt: new Date().toISOString()
-        }};
-        localStorage.setItem("japan_pr_state", JSON.stringify(payload));
+        localStorage.setItem("japan_pr_state", JSON.stringify(buildStatePayload()));
       }} catch(e) {{
         console.warn("Failed to save localStorage:", e);
       }}
@@ -1767,7 +1839,7 @@ html_content = f'''<!DOCTYPE html>
             </p>
             <ul style="padding-left: 20px; margin-bottom: 16px; line-height: 1.8;">
               <li><b>Undang-Undang Pengawasan Imigrasi dan Pengakuan Pengungsi (出入国管理及び難民認定法 / UU No. 319 Tahun 1951)</b> — Pasal 22 (Izin Tinggal Tetap), Pasal 7-2, dan Pasal 22-4 (Pencabutan Status Izin Tinggal).</li>
-              <li><b>Peraturan Menteri tentang Standar Tenaga Kerja Ahli Tingkat Lanjut (高度専門職省令 / Peraturan Kementerian Kehakiman No. 426M60000010037 Tahun 2014)</b> — Kriteria resmi evaluasi poin untuk Kategori 1(a), 1(b), 1(c), dan ketentuan J-Skip.</li>
+              <li><b>Peraturan Menteri tentang Standar Tenaga Kerja Ahli Tingkat Lanjut (高度専門職省令 / Peraturan Kementerian Kehakiman No. 37 Tahun 2014, ID hukum e-Gov 426M60000010037)</b> — Kriteria resmi evaluasi poin untuk Kategori 1(a), 1(b), 1(c), dan ketentuan J-Skip.</li>
               <li><b>Pedoman Pemberian Izin Tinggal Tetap (永住許可に関するガイドライン)</b> — Bagian 1 (Persyaratan Hukum: Kelakuan Baik, Kemandirian Ekonomi, Kepentingan Nasional), Bagian 2 (Pengecualian Khusus untuk Pasangan, Penduduk Jangka Panjang, HSP, dan J-Skip).</li>
               <li><b>e-Gov Konsultasi Publik Kabinet Perkara No. 315000140 (e-Gov パブリックコメント案件番号 315000140)</b> — Usulan revisi Pedoman Izin Tinggal Tetap terkait tolok ukur penghidupan rumah tangga, kecukupan 30 tahun pensiun publik, dan kompensasi aset.</li>
               <li><b>Undang-Undang Asuransi Kesehatan &amp; Pensiun Publik (国民健康保険法・健康保険法・国民年金法・厚生年金保険法)</b> — Dasar hukum untuk verifikasi ketat kepatuhan pembayaran tepat waktu sebelum jatuh tempo.</li>
@@ -1793,7 +1865,7 @@ html_content = f'''<!DOCTYPE html>
             </p>
             <ul style="padding-left: 20px; margin-bottom: 16px; line-height: 1.8;">
               <li><b>Immigration Control and Refugee Recognition Act (出入国管理及び難民認定法 / Act No. 319 of 1951)</b> — Article 22 (Permission for Permanent Residence), Article 7-2, and Article 22-4 (Revocation of Status of Residence).</li>
-              <li><b>Ministerial Ordinance on Standards for Highly Skilled Professionals (高度専門職省令 / Ministry of Justice Ordinance No. 426M60000010037 of 2014)</b> — Official point evaluation criteria for Categories 1(a), 1(b), 1(c), and J-Skip provisions.</li>
+              <li><b>Ministerial Ordinance on Standards for Highly Skilled Professionals (高度専門職省令 / Ministry of Justice Ordinance No. 37 of 2014, e-Gov law ID 426M60000010037)</b> — Official point evaluation criteria for Categories 1(a), 1(b), 1(c), and J-Skip provisions.</li>
               <li><b>Guidelines for Permission for Permanent Residence (永住許可に関するガイドライン)</b> — Section 1 (Statutory Requirements: Good Conduct, Independent Livelihood, National Interest), Section 2 (Special Exceptions for Spouses, Long-Term Residents, HSPs, and J-Skip).</li>
               <li><b>Cabinet e-Gov Public Comment Case No. 315000140 (e-Gov パブリックコメント案件番号 315000140)</b> — Proposed revisions to the Permanent Residency Guidelines regarding household livelihood benchmarks, 30-year public pension adequacy, and asset offsets.</li>
               <li><b>Public Health Insurance &amp; Pension Acts (国民健康保険法・健康保険法・国民年金法・厚生年金保険法)</b> — Statutory basis for strict on-time payment compliance verification.</li>
@@ -1913,7 +1985,7 @@ html_content = f'''<!DOCTYPE html>
             <div class="item-q">${{qText}}</div>
             <div class="item-proof"><b>${{proofLabel}}</b> ${{proofText}}</div>
             <div>
-              <span class="item-ref" onclick="openRefModal('${{item.ref_id}}')">[${{item.ref_id}}] ${{refLinkText}}</span>
+              <button type="button" class="item-ref" onclick="openRefModal('${{item.ref_id}}')">[${{item.ref_id}}] ${{refLinkText}}</button>
             </div>
           </div>
           <div class="item-actions">
@@ -2058,7 +2130,7 @@ html_content = f'''<!DOCTYPE html>
     }}
 
     // =========================================================================
-    // HSP POINTS CALCULATOR ENGINE (Ordinance 426M60000010037)
+    // HSP POINTS CALCULATOR ENGINE (MOJ Ordinance No. 37 of 2014)
     // =========================================================================
     function resetCalculator() {{
       document.getElementById("calcCategory").value = "1b";
@@ -2102,18 +2174,9 @@ html_content = f'''<!DOCTYPE html>
       if (jpSel) jpSel.value = "0";
 
       lockedFilingScore = null;
-      lockedPriorScore = null;
-      const isId = (currentLang === 'id');
-      const btnLockF = document.getElementById("btnLockFiling");
-      if (btnLockF) btnLockF.textContent = isId ? "Kunci Skor Tanggal Pengajuan Saat Ini" : "Lock as Current Filing Date Score";
-      const btnLockP = document.getElementById("btnLockPrior");
-      if (btnLockP) btnLockP.textContent = isId ? "Kunci Skor 1/3 Tahun Sebelumnya" : "Lock as 1/3-Year Prior Score";
-      const dF = document.getElementById("dualFiling");
-      if (dF) dF.textContent = "-";
-      const dP = document.getElementById("dualPrior");
-      if (dP) dP.textContent = "-";
-      const dV = document.getElementById("dualVerdict");
-      if (dV) dV.textContent = "";
+      lockedPrior1Score = null;
+      lockedPrior3Score = null;
+      renderDualAudit();
 
       calculatePoints();
       saveState();
@@ -2122,6 +2185,10 @@ html_content = f'''<!DOCTYPE html>
     function handleCategoryChange() {{
       const isId = (currentLang === 'id');
       const cat = document.getElementById("calcCategory").value;
+      // Point tables differ per category, so a value like "10" means different brackets;
+      // keep selections only when the category is unchanged (e.g. a language switch).
+      const keepSelections = (lastCalcCategory === null || lastCalcCategory === cat);
+      lastCalcCategory = cat;
       const jskipPanel = document.getElementById("jskipPanel");
 
       if (cat === "jskip") {{
@@ -2139,13 +2206,14 @@ html_content = f'''<!DOCTYPE html>
         document.getElementById("cardExperience").style.display = "block";
         document.getElementById("cardAge").style.display = "block";
         document.getElementById("cardSalary").style.display = "block";
-        document.getElementById("cardResearch").style.display = "block";
+        document.getElementById("cardResearch").style.display = (cat === "1c") ? "none" : "block";
         document.getElementById("cardExclusive").style.display = "block";
         document.getElementById("cardAdditions").style.display = "block";
       }}
 
       // Degree options
       const degSel = document.getElementById("calcDegree");
+      const curDeg = degSel.value;
       degSel.innerHTML = "";
       if (cat === "1a") {{
         degSel.innerHTML = isId ? `
@@ -2235,7 +2303,10 @@ html_content = f'''<!DOCTYPE html>
           <option value="25">More than 10 years (25 pts)</option>
         `;
       }}
-      if (curExp) expSel.value = curExp;
+      if (keepSelections) {{
+        setSelectValue(degSel, curDeg);
+        setSelectValue(expSel, curExp);
+      }}
 
       // Age controls
       if (cat === "1c") {{
@@ -2252,7 +2323,7 @@ html_content = f'''<!DOCTYPE html>
       salSel.innerHTML = "";
       if (cat === "1a" || cat === "1b") {{
         salSel.innerHTML = isId ? `
-          <option value="disqualify">Di bawah ¥3.000.000</option>
+          <option value="${{cat === "1a" ? "under3m" : "disqualify"}}">Di bawah ¥3.000.000${{cat === "1a" ? " (0 poin)" : ""}}</option>
           <option value="0" selected>¥3.000.000 hingga kurang dari ¥4.000.000</option>
           <option value="10">¥4.000.000 hingga kurang dari ¥5.000.000 (10 poin - hanya usia &lt;30 thn)</option>
           <option value="15">¥5.000.000 hingga kurang dari ¥6.000.000 (15 poin - hanya usia &lt;35 thn)</option>
@@ -2262,7 +2333,7 @@ html_content = f'''<!DOCTYPE html>
           <option value="35">¥9.000.000 hingga kurang dari ¥10.000.000 (35 poin)</option>
           <option value="40">¥10.000.000 atau lebih (40 poin)</option>
         ` : `
-          <option value="disqualify">Under ¥3,000,000</option>
+          <option value="${{cat === "1a" ? "under3m" : "disqualify"}}">Under ¥3,000,000${{cat === "1a" ? " (0 pts)" : ""}}</option>
           <option value="0" selected>¥3,000,000 to less than ¥4,000,000</option>
           <option value="10">¥4,000,000 to less than ¥5,000,000 (10 pts - &lt;30 yrs old only)</option>
           <option value="15">¥5,000,000 to less than ¥6,000,000 (15 pts - &lt;35 yrs old only)</option>
@@ -2291,7 +2362,9 @@ html_content = f'''<!DOCTYPE html>
           <option value="50">¥30,000,000 or more (50 pts)</option>
         `;
       }}
-      if (curSal) salSel.value = curSal;
+      // "Under ¥3M" is a disqualifier for 1(b)/1(c) but only 0 pts for 1(a); map between them on category change.
+      const underVal = (cat === "1a") ? "under3m" : "disqualify";
+      if (keepSelections) setSelectValue(salSel, (curSal === "under3m" || curSal === "disqualify") ? underVal : curSal);
 
       // Exclusive controls visibility
       document.getElementById("secLicenses1b").style.display = (cat === "1b") ? "block" : "none";
@@ -2329,6 +2402,7 @@ html_content = f'''<!DOCTYPE html>
           status.textContent = isId ? "Pilih Jalur J-Skip" : "Select J-Skip Track";
           status.style.color = "var(--text-muted)";
         }}
+        saveState();
         return;
       }}
 
@@ -2346,8 +2420,10 @@ html_content = f'''<!DOCTYPE html>
       let pSalary = 0;
       const salAlert = document.getElementById("salaryAlertMin");
       const salAlertAge = document.getElementById("salaryAlertAge");
+      // Annual salary of ¥3M or more is a threshold requirement for 1(b) and 1(c) only.
+      const salaryDisqualified = (salVal === "disqualify" && cat !== "1a");
 
-      if (salVal === "disqualify") {{
+      if (salaryDisqualified) {{
         if (salAlert) salAlert.style.display = "block";
         if (salAlertAge) salAlertAge.style.display = "none";
         pSalary = 0;
@@ -2401,9 +2477,8 @@ html_content = f'''<!DOCTYPE html>
         else if (resCount === 1) pResearch = 20;
       }} else if (cat === "1b") {{
         if (resCount >= 1) pResearch = 15;
-      }} else if (cat === "1c") {{
-        if (resCount >= 1) pResearch = 15;
       }}
+      // 1(c) has no research-achievement points.
 
       let pExclusive = 0;
       if (cat === "1b") {{
@@ -2442,7 +2517,9 @@ html_content = f'''<!DOCTYPE html>
       document.getElementById("subExclusive").textContent = pExclusive;
       document.getElementById("subAdditions").textContent = pAdd;
 
-      const total = pAcademic + pExp + pAge + pSalary + pResearch + pExclusive + pAdd;
+      const rawTotal = pAcademic + pExp + pAge + pSalary + pResearch + pExclusive + pAdd;
+      // Below the ¥3M salary floor the applicant does not qualify at any point total.
+      const total = salaryDisqualified ? 0 : rawTotal;
       document.getElementById("subTotal").textContent = total;
       document.getElementById("scoreValue").textContent = total;
       document.getElementById("badgeScore").textContent = total > 0 ? `(${{total}} ${{isId ? 'poin' : 'pts'}})` : "";
@@ -2450,7 +2527,12 @@ html_content = f'''<!DOCTYPE html>
       const circle = document.getElementById("scoreCircle");
       const status = document.getElementById("scoreStatus");
 
-      if (total >= 80) {{
+      if (salaryDisqualified) {{
+        circle.style.borderColor = "var(--danger)";
+        document.getElementById("scoreValue").style.color = "var(--danger)";
+        status.textContent = isId ? "Tidak Memenuhi Syarat: gaji tahunan di bawah minimum ¥3.000.000" : "Not Eligible: annual salary below the ¥3,000,000 minimum";
+        status.style.color = "var(--danger)";
+      }} else if (total >= 80) {{
         circle.style.borderColor = "var(--success)";
         document.getElementById("scoreValue").style.color = "var(--success)";
         status.textContent = isId ? "Memenuhi Syarat Jalur Cepat 1 Tahun (80+ Poin)" : "Eligible for 1-Year Fast Track (80+ Points)";
@@ -2472,71 +2554,110 @@ html_content = f'''<!DOCTYPE html>
         status.style.color = "var(--text-muted)";
       }}
 
+      saveState();
       return total;
     }}
 
+    const LOCK_LABELS = {{
+      filing: {{
+        en: ["Lock as Current Filing Date Score", "Unlock the Current Filing Date Score"],
+        id: ["Kunci Skor Tanggal Pengajuan Saat Ini", "Buka Kunci Skor Tanggal Pengajuan Saat Ini"]
+      }},
+      prior1: {{
+        en: ["Lock as 1-Year Prior Score", "Unlock the 1-Year Prior Score"],
+        id: ["Kunci Skor 1 Tahun Sebelumnya", "Buka Kunci Skor 1 Tahun Sebelumnya"]
+      }},
+      prior3: {{
+        en: ["Lock as 3-Year Prior Score", "Unlock the 3-Year Prior Score"],
+        id: ["Kunci Skor 3 Tahun Sebelumnya", "Buka Kunci Skor 3 Tahun Sebelumnya"]
+      }}
+    }};
+
+    // Syncs the lock buttons, locked-score displays and verdict with the locked-score state.
+    function renderDualAudit() {{
+      const lang = (currentLang === 'id') ? 'id' : 'en';
+      const unit = (lang === 'id') ? 'poin' : 'points';
+      [
+        ["btnLockFiling", "dualFiling", "filing", lockedFilingScore],
+        ["btnLockPrior1", "dualPrior1", "prior1", lockedPrior1Score],
+        ["btnLockPrior3", "dualPrior3", "prior3", lockedPrior3Score]
+      ].forEach(([btnId, valId, key, score]) => {{
+        const btn = document.getElementById(btnId);
+        if (btn) btn.textContent = LOCK_LABELS[key][lang][score === null ? 0 : 1];
+        const val = document.getElementById(valId);
+        if (val) val.textContent = (score === null) ? "-" : `${{score}} ${{unit}}`;
+      }});
+      evaluateDualScores();
+    }}
+
+    // Returns the current points total, or null when there is nothing to lock (J-Skip has no points total).
+    function lockableScore() {{
+      const score = calculatePoints();
+      return (typeof score === "number") ? score : null;
+    }}
+
     function saveFilingDateScore() {{
-      const isId = (currentLang === 'id');
-      const btn = document.getElementById("btnLockFiling");
-      if (lockedFilingScore !== null) {{
-        lockedFilingScore = null;
-        const dF = document.getElementById("dualFiling");
-        if (dF) dF.textContent = "-";
-        if (btn) btn.textContent = isId ? "Kunci Skor Tanggal Pengajuan Saat Ini" : "Lock as Current Filing Date Score";
-      }} else {{
-        lockedFilingScore = calculatePoints();
-        const dF = document.getElementById("dualFiling");
-        if (dF) dF.textContent = `${{lockedFilingScore}} ${{isId ? 'poin' : 'points'}}`;
-        if (btn) btn.textContent = isId ? "Buka Kunci Skor Tanggal Pengajuan Saat Ini" : "Unlock the Current Filing Date Score";
-      }}
-      evaluateDualScores();
+      lockedFilingScore = (lockedFilingScore !== null) ? null : lockableScore();
+      renderDualAudit();
       saveState();
     }}
 
-    function savePriorDateScore() {{
-      const isId = (currentLang === 'id');
-      const btn = document.getElementById("btnLockPrior");
-      if (lockedPriorScore !== null) {{
-        lockedPriorScore = null;
-        const dP = document.getElementById("dualPrior");
-        if (dP) dP.textContent = "-";
-        if (btn) btn.textContent = isId ? "Kunci Skor 1/3 Tahun Sebelumnya" : "Lock as 1/3-Year Prior Score";
+    // years: 1 for the 80-point route benchmark, 3 for the 70-point route benchmark.
+    function savePriorDateScore(years) {{
+      if (years === 3) {{
+        lockedPrior3Score = (lockedPrior3Score !== null) ? null : lockableScore();
       }} else {{
-        lockedPriorScore = calculatePoints();
-        const dP = document.getElementById("dualPrior");
-        if (dP) dP.textContent = `${{lockedPriorScore}} ${{isId ? 'poin' : 'points'}}`;
-        if (btn) btn.textContent = isId ? "Buka Kunci Skor 1/3 Tahun Sebelumnya" : "Unlock the 1/3-Year Prior Score";
+        lockedPrior1Score = (lockedPrior1Score !== null) ? null : lockableScore();
       }}
-      evaluateDualScores();
+      renderDualAudit();
       saveState();
     }}
 
+    // Guidelines 2(6)/2(7): 70-point route needs 70+ at filing and 3 years before;
+    // 80-point route needs 80+ at filing and 1 year before.
     function evaluateDualScores() {{
       const isId = (currentLang === 'id');
       const verdict = document.getElementById("dualVerdict");
       if (!verdict) return;
-      if (lockedFilingScore === null && lockedPriorScore === null) {{
-        verdict.textContent = "";
+      const F = lockedFilingScore, P1 = lockedPrior1Score, P3 = lockedPrior3Score;
+      const setVerdict = (text, color) => {{ verdict.textContent = text; verdict.style.color = color; }};
+
+      if (F === null && P1 === null && P3 === null) {{
+        setVerdict("", "var(--text-muted)");
         return;
       }}
-      if (lockedFilingScore === null || lockedPriorScore === null) {{
-        verdict.textContent = isId ? "Kunci kedua titik waktu untuk mengaudit kelayakan berkelanjutan." : "Lock both timestamps to audit continuous eligibility.";
-        verdict.style.color = "var(--text-muted)";
+      if (F === null) {{
+        setVerdict(isId ? "Kunci skor tanggal pengajuan untuk memulai audit." : "Lock the filing date score to start the audit.", "var(--text-muted)");
         return;
       }}
 
-      if (lockedFilingScore >= 80 && lockedPriorScore >= 80) {{
-        verdict.innerHTML = isId ? "Memenuhi Syarat Jalur 80 Poin (1 Tahun): Mempertahankan skor 80+ pada kedua tanggal (Qualified for 80-Point Route)." : "Qualified for 80-Point (1-Year) Route: Maintained 80+ at both dates.";
-        verdict.style.color = "var(--success)";
-      }} else if (lockedFilingScore >= 70 && lockedPriorScore >= 70) {{
-        verdict.innerHTML = isId ? "Memenuhi Syarat Jalur 70 Poin (3 Tahun): Mempertahankan skor 70+ pada kedua tanggal (Qualified for 70-Point Route)." : "Qualified for 70-Point (3-Year) Route: Maintained 70+ at both dates.";
-        verdict.style.color = "var(--accent-navy)";
-      }} else if (lockedFilingScore >= 80 && lockedPriorScore < 80) {{
-        verdict.innerHTML = isId ? "Skor saat ini adalah 80+, namun skor retroaktif sebelumnya di bawah 80. Anda harus mempertahankan 80+ poin selama 1 tahun penuh sebelum mengajukan (must maintain 80+ points for a full 1 year)." : "Current score is 80+, but retroactive score was below 80. You must maintain 80+ points for a full 1 year before filing.";
-        verdict.style.color = "var(--warning)";
+      const route80 = (F < 80) ? "fail" : (P1 === null ? "pending" : (P1 >= 80 ? "pass" : "fail"));
+      const route70 = (F < 70) ? "fail" : (P3 === null ? "pending" : (P3 >= 70 ? "pass" : "fail"));
+
+      if (route80 === "pass") {{
+        setVerdict(isId
+          ? "Memenuhi Syarat Jalur 80 Poin (1 Tahun): 80+ poin pada tanggal pengajuan dan 1 tahun sebelumnya."
+          : "Qualified for 80-Point (1-Year) Route: 80+ points at filing and 1 year before.", "var(--success)");
+      }} else if (route70 === "pass") {{
+        let text = isId
+          ? "Memenuhi Syarat Jalur 70 Poin (3 Tahun): 70+ poin pada tanggal pengajuan dan 3 tahun sebelumnya."
+          : "Qualified for 70-Point (3-Year) Route: 70+ points at filing and 3 years before.";
+        if (route80 === "pending") text += isId ? " Kunci skor 1 tahun sebelumnya untuk memeriksa jalur 80 poin." : " Lock the 1-year prior score to check the 80-point route.";
+        setVerdict(text, "var(--accent-navy)");
+      }} else if (route80 === "pending" || route70 === "pending") {{
+        const needed = [];
+        if (route80 === "pending") needed.push(isId ? "1 tahun sebelumnya (jalur 80 poin)" : "1-year prior (80-point route)");
+        if (route70 === "pending") needed.push(isId ? "3 tahun sebelumnya (jalur 70 poin)" : "3-year prior (70-point route)");
+        const prefix = (route80 === "fail" && F >= 80)
+          ? (isId ? "Skor 1 tahun sebelumnya di bawah 80, sehingga jalur 80 poin belum terpenuhi. " : "The 1-year prior score is below 80, so the 80-point route is not met. ")
+          : "";
+        setVerdict(prefix + (isId ? "Kunci skor " : "Lock the ") + needed.join(isId ? " dan " : " and ") + (isId ? " untuk menyelesaikan audit." : " score to finish the audit."), "var(--text-muted)");
       }} else {{
-        verdict.innerHTML = isId ? "Tidak Memenuhi Syarat: Skor berada di bawah ambang batas pada salah satu atau kedua tanggal patokan (Disqualified)." : "Disqualified: Score was below threshold at one or both benchmark dates.";
-        verdict.style.color = "var(--danger)";
+        let reason;
+        if (F < 70) reason = isId ? "skor tanggal pengajuan di bawah 70." : "the filing date score is below 70.";
+        else if (F >= 80) reason = isId ? "skor 1 tahun sebelumnya di bawah 80 dan skor 3 tahun sebelumnya di bawah 70." : "the 1-year prior score is below 80 and the 3-year prior score is below 70.";
+        else reason = isId ? "skor 3 tahun sebelumnya di bawah 70." : "the 3-year prior score is below 70.";
+        setVerdict((isId ? "Tidak Memenuhi Syarat: " : "Disqualified: ") + reason, "var(--danger)");
       }}
     }}
 
@@ -2550,24 +2671,30 @@ html_content = f'''<!DOCTYPE html>
       kiso_children: {{ label: "MHLW Children Mean", value: 8573000 }},
       nta_wage: {{ label: "NTA Salaried Mean", value: 4780000 }}
     }};
+    // Average household income by household size (1–4 persons) and the addition per person from 5.
+    const HOUSEHOLD_SIZE_BARS = {{ 1: 3183000, 2: 4756000, 3: 6204000, 4: 7532000 }};
+    const HOUSEHOLD_EXTRA_PERSON = 800000;
 
     function runReformSimulation() {{
       const isId = (currentLang === 'id');
       const benchKey = document.getElementById("simBenchmark").value;
-      const baseBench = BENCHMARKS[benchKey]?.value || 5752000;
-      
-      const hhSize = Math.max(1, +document.getElementById("simHhSize").value || 1);
-      const abroad = +document.getElementById("simHhAbroad").value || 0;
-      const effectiveSize = Math.max(hhSize, hhSize + abroad);
 
-      let requiredIncome = baseBench;
-      if (effectiveSize === 1) requiredIncome = 3183000;
-      else if (effectiveSize === 2) requiredIncome = 4756000;
-      else if (effectiveSize === 3) requiredIncome = 6204000;
-      else if (effectiveSize === 4) requiredIncome = 7532000;
-      else if (effectiveSize >= 5) requiredIncome = 7532000 + (effectiveSize - 4) * 800000;
+      const hhSize = Math.max(1, Math.floor(+document.getElementById("simHhSize").value || 1));
+      const abroad = Math.max(0, Math.floor(+document.getElementById("simHhAbroad").value || 0));
+      // Draft guideline: dependents living abroad are added to the household size.
+      const effectiveSize = hhSize + abroad;
 
-      requiredIncome = Math.max(requiredIncome, baseBench);
+      // Draft guideline: the bar is the average income of Japanese households of the same size,
+      // with a per-person addition for households of 5 or more. The flat statistics are what-if
+      // alternatives and are used as-is, without household-size scaling.
+      let requiredIncome;
+      if (benchKey in BENCHMARKS) {{
+        requiredIncome = BENCHMARKS[benchKey].value;
+      }} else if (effectiveSize >= 5) {{
+        requiredIncome = HOUSEHOLD_SIZE_BARS[4] + (effectiveSize - 4) * HOUSEHOLD_EXTRA_PERSON;
+      }} else {{
+        requiredIncome = HOUSEHOLD_SIZE_BARS[effectiveSize];
+      }}
 
       const applicantIncome = (+document.getElementById("simIncome").value || 0) * 10000;
       const spouseIncome = (+document.getElementById("simSpouseIncome").value || 0) * 10000;
@@ -2575,13 +2702,13 @@ html_content = f'''<!DOCTYPE html>
       const qualifyingIncome = applicantIncome + spouseIncome + famIncome;
 
       const g1Passed = qualifyingIncome >= requiredIncome;
-      document.getElementById("simGate1Result").textContent = `¥${{(qualifyingIncome/10000).toLocaleString()}} 万円`;
+      document.getElementById("simGate1Result").textContent = `${{(qualifyingIncome/10000).toLocaleString()}}万円`;
       const g1Badge = document.getElementById("simGate1Badge");
       g1Badge.textContent = g1Passed ? (isId ? "LULUS (PASSED)" : "PASSED") : (isId ? "KEKURANGAN (SHORTFALL)" : "SHORTFALL");
       g1Badge.style.color = g1Passed ? "var(--success)" : "var(--danger)";
       document.getElementById("simGate1Detail").textContent = isId 
-        ? `Memenuhi Syarat: ¥${{(qualifyingIncome/10000).toLocaleString()}}万 / Batas Wajib (Required Bar): ¥${{(requiredIncome/10000).toLocaleString()}}万`
-        : `Qualifying: ¥${{(qualifyingIncome/10000).toLocaleString()}}万 / Required Bar: ¥${{(requiredIncome/10000).toLocaleString()}}万`;
+        ? `Memenuhi Syarat: ${{(qualifyingIncome/10000).toLocaleString()}}万円 / Batas Wajib (Required Bar): ${{(requiredIncome/10000).toLocaleString()}}万円 (${{effectiveSize}} orang)`
+        : `Qualifying: ${{(qualifyingIncome/10000).toLocaleString()}}万円 / Required Bar: ${{(requiredIncome/10000).toLocaleString()}}万円 (${{effectiveSize}}-person household)`;
 
       const F = 847296;
       const k = 0.005481;
@@ -2626,7 +2753,7 @@ html_content = f'''<!DOCTYPE html>
         assetBox.style.display = "none";
       }} else {{
         assetBox.style.display = "block";
-        document.getElementById("simAssetOffsetVal").textContent = `¥${{(Math.round(requiredAssets/10000)).toLocaleString()}} 万円 (約 ${{Math.round(requiredAssets).toLocaleString()}} 円)`;
+        document.getElementById("simAssetOffsetVal").textContent = `${{(Math.round(requiredAssets/10000)).toLocaleString()}}万円 (≈ ¥${{Math.round(requiredAssets).toLocaleString()}})`;
       }}
     }}
 
@@ -2834,7 +2961,7 @@ html_content = f'''<!DOCTYPE html>
             <tbody>
               ${{b.docs.map(([doc, note]) => `
                 <tr>
-                  <td style="text-align:center;"><input type="checkbox"></td>
+                  <td style="text-align:center;"><input type="checkbox" aria-label="${{String(doc).replace(/<[^>]*>/g, "").replace(/"/g, "&quot;")}}"></td>
                   <td><b>${{doc}}</b></td>
                   <td style="color:var(--text-muted);">${{note}}</td>
                 </tr>
@@ -2848,14 +2975,15 @@ html_content = f'''<!DOCTYPE html>
 
     function exportDataJSON() {{
       saveState();
-      const payload = localStorage.getItem("japan_pr_state");
-      const blob = new Blob([payload || "{{}}"], {{ type: "application/json" }});
+      const blob = new Blob([JSON.stringify(buildStatePayload(), null, 2)], {{ type: "application/json" }});
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
       a.download = `japan_pr_checklist_backup_${{new Date().toISOString().slice(0,10)}}.json`;
+      document.body.appendChild(a);
       a.click();
-      URL.revokeObjectURL(url);
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
     }}
 
     function triggerImportJSON() {{
@@ -2863,189 +2991,49 @@ html_content = f'''<!DOCTYPE html>
     }}
 
     function handleFileImport(e) {{
-      const file = e.target.files[0];
+      const input = e.target;
+      const file = input.files[0];
       if (!file) return;
       const reader = new FileReader();
       reader.onload = function(evt) {{
         try {{
           const parsed = JSON.parse(evt.target.result);
-          if (parsed.currentLang) currentLang = parsed.currentLang;
-          if (parsed.currentRoute) currentRoute = parsed.currentRoute;
-          if (parsed.checklistAnswers) checklistAnswers = parsed.checklistAnswers;
-          if (parsed.checklistNotes) checklistNotes = parsed.checklistNotes;
-          saveState();
+          if (!parsed || typeof parsed !== "object" || Array.isArray(parsed) ||
+              !("checklistAnswers" in parsed || "calcInputs" in parsed || "currentRoute" in parsed)) {{
+            throw new Error(currentLang === 'id' ? "bukan file cadangan aplikasi ini" : "not a backup from this app");
+          }}
+          applyState(parsed);
           setLanguage(currentLang);
+          restoreCalcInputs(savedCalcInputs);
+          renderDualAudit();
+          saveState();
           alert(currentLang === 'id' ? "Pencadangan data berhasil dipulihkan!" : "Backup successfully restored!");
         }} catch(err) {{
           alert((currentLang === 'id' ? "File cadangan tidak valid: " : "Invalid backup file: ") + err.message);
         }}
       }};
       reader.readAsText(file);
+      // Clear the input so choosing the same file again still fires "change".
+      input.value = "";
     }}
 
-    // =========================================================================
-    // AUTOMATED VERIFICATION TEST SUITE
-    // =========================================================================
-    const TEST_SUITE = [
-      {{
-        name: "Route Data Integrity",
-        run: () => {{
-          const routes = Object.keys(ROUTE_ITEMS);
-          if (routes.length !== 7) throw new Error(`Expected 7 routes, got ${{routes.length}}`);
-          if (!ROUTE_ITEMS["10-Year Standard Route"]) throw new Error("10-Year route missing");
-          if (!ROUTE_ITEMS["80-Point HSP (1-Year)"]) throw new Error("HSP 80 route missing");
-          return `All 7 routes verified (${{routes.length}} routes).`;
-        }}
-      }},
-      {{
-        name: "Statutory References Integrity",
-        run: () => {{
-          if (STATUTORY_REFS.length < 10) throw new Error("Insufficient statutory references");
-          const ref1 = STATUTORY_REFS.find(r => r.ref_id === "REF-01");
-          if (!ref1 || !ref1.law_title) throw new Error("REF-01 invalid");
-          return `Verified ${{STATUTORY_REFS.length}} statutory reference mappings.`;
-        }}
-      }},
-      {{
-        name: "HSP Category 1(a) Point Calculation Logic",
-        run: () => {{
-          const academic = 30;
-          const exp = 15;
-          const age = 15;
-          const sal = 40;
-          const res = 25;
-          const total = academic + exp + age + sal + res;
-          if (total !== 125) throw new Error(`Expected 125, got ${{total}}`);
-          return `1(a) scoring logic accurate: 125 points verified.`;
-        }}
-      }},
-      {{
-        name: "HSP Category 1(b) IT National License & ¥3M Salary Minimum",
-        run: () => {{
-          const licPoints = 10;
-          const minSalary = 3000000;
-          const testSalUnder = 2800000;
-          if (testSalUnder < minSalary !== true) throw new Error("Min salary check failed");
-          if (licPoints !== 10) throw new Error("License points calculation failed");
-          return "1(b) license (+10 pts) and ¥3M statutory minimum verified.";
-        }}
-      }},
-      {{
-        name: "HSP Category 1(c) Zero-Age Points & Executive Status",
-        run: () => {{
-          const agePoints1c = 0;
-          const repDirector = 10;
-          const invest100M = 5;
-          const totalExclusive = agePoints1c + repDirector + invest100M;
-          if (totalExclusive !== 15) throw new Error("1(c) exclusive rules failed");
-          return "1(c) zero-age rule and executive status verified.";
-        }}
-      }},
-      {{
-        name: "e-Gov 315000140 Pension Gate 2 Benchmark Formula",
-        run: () => {{
-          const F = 847296;
-          const k = 0.005481;
-          const H = 5752000;
-          const benchmark = (F * (360 / 480)) + ((H / 12) * k * 360);
-          const expected = 1581274;
-          if (Math.abs(benchmark - expected) > 2) throw new Error(`Benchmark mismatch: ${{benchmark}} vs ${{expected}}`);
-          return `Pension Gate 2 benchmark verified: ¥${{Math.round(benchmark)}}/yr.`;
-        }}
-      }},
-      {{
-        name: "e-Gov 315000140 Income Gate 1 Pooling & Shikakugai Exclusion",
-        run: () => {{
-          const applicant = 6000000;
-          const spouse = 2000000;
-          const shikakugai = 1200000;
-          const pooled = applicant + spouse;
-          if (pooled !== 8000000) throw new Error("Income pooling calculation error");
-          if (pooled + shikakugai === pooled) throw new Error("Shikakugai was erroneously included");
-          return "Gate 1 household pooling and 資格外活動 exclusion verified.";
-        }}
-      }},
-      {{
-        name: "J-Skip Fast Track Evaluation",
-        run: () => {{
-          const t1_salary = 20000000;
-          const t1_hasDegree = true;
-          const t1_pass = t1_salary >= 20000000 && t1_hasDegree;
-          if (!t1_pass) throw new Error("J-Skip Track 1 evaluation failed");
-          return "J-Skip Fast Track 1-year eligibility rules verified.";
-        }}
-      }},
-      {{
-        name: "Submission Checklist Consistency",
-        run: () => {{
-          const meta = ROUTE_METADATA["80-Point HSP (1-Year)"];
-          if (meta.tax !== 1 || meta.soc !== "直近1年") throw new Error("HSP 80 windows mismatch");
-          return "Assembly guide windows verified (1-year tax/soc for 80p).";
-        }}
-      }},
-      {{
-        name: "Japanese Uni + JLPT N2 Exclusivity Rule",
-        run: () => {{
-          const hasJpUni = true;
-          const n2Val = 10;
-          let bonus = 0;
-          if (hasJpUni) bonus += 10;
-          if (n2Val === 10 && !hasJpUni) bonus += 10;
-          if (bonus !== 10) throw new Error("Exclusivity rule failed");
-          return "N2 points blocked when Japanese degree held (+10 pts total).";
-        }}
-      }},
-      {{
-        name: "Innovation SME & R&D Ratio Exclusivity",
-        run: () => {{
-          const isLarge = "10";
-          const isSme = "20";
-          if (isLarge === "20") throw new Error("Large enterprise treated as SME");
-          return "SME R&D ratio (+5 pts) exclusive to SME innovation track.";
-        }}
-      }},
-      {{
-        name: "Dual-Timestamp Continuous Qualification Logic",
-        run: () => {{
-          const nowScore = 85;
-          const priorScore = 65;
-          const qualified = nowScore >= 80 && priorScore >= 80;
-          if (qualified) throw new Error("Should not qualify if prior score was below 80");
-          return "Dual-timestamp continuity verified (prior score must meet threshold).";
-        }}
-      }},
-      {{
-        name: "Household Scale 5+ Members Incremental Addition",
-        run: () => {{
-          const base4 = 7532000;
-          const inc = 800000;
-          const size5 = base4 + inc;
-          if (size5 !== 8332000) throw new Error("Household size 5 bar calculation failed");
-          return "Household size 5+ increment (+¥800k/member) verified: ¥8,332,000.";
-        }}
-      }},
-      {{
-        name: "LocalStorage Round-Trip Integrity",
-        run: () => {{
-          const testObj = {{ test: "roundtrip", timestamp: Date.now() }};
-          const str = JSON.stringify(testObj);
-          const back = JSON.parse(str);
-          if (back.test !== "roundtrip") throw new Error("Serialization round-trip failed");
-          return "State JSON persistence verified.";
-        }}
-      }}
-    ];
+    window.addEventListener("keydown", (e) => {{
+      if (e.key === "Escape") closeRefModal();
+    }});
 
     window.addEventListener("DOMContentLoaded", () => {{
       loadSavedState();
       setLanguage(currentLang);
+      restoreCalcInputs(savedCalcInputs);
+      renderDualAudit();
+      saveState();
     }});
   </script>
 </body>
 </html>
 '''
 
-output_file = Path('index.html') if Path('pr_data.json').exists() else Path('generic/index.html')
+output_file = Path(__file__).resolve().parent / 'index.html'
 with open(output_file, 'w', encoding='utf-8') as f:
     f.write(html_content)
 
