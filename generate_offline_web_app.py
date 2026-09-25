@@ -1591,11 +1591,35 @@ html_content = f'''<!DOCTYPE html>
 
       const dualTitle = document.getElementById("calcDualAuditTitle"); if (dualTitle) dualTitle.textContent = isId ? "Audit Kontinu Dua Titik Waktu:" : "Dual-Timestamp Continuous Audit:";
       const dualDesc = document.getElementById("calcDualAuditDesc"); if (dualDesc) dualDesc.innerHTML = isId ? "Buktikan bahwa 80+ atau 70+ poin terpenuhi pada <b>kedua</b> tanggal: tanggal pengajuan dan titik patokan 1 tahun / 3 tahun sebelumnya." : "Prove 80+ or 70+ was held at <b>both</b> filing date and 1-yr / 3-yr prior benchmark.";
-      const btnLockF = document.getElementById("btnLockFiling"); if (btnLockF) btnLockF.textContent = isId ? "Kunci Skor Tanggal Pengajuan Saat Ini" : "Lock as Current Filing Date Score";
-      const btnLockP = document.getElementById("btnLockPrior"); if (btnLockP) btnLockP.textContent = isId ? "Kunci Skor 1/3 Tahun Sebelumnya" : "Lock as 1/3-Year Prior Score";
+      const btnLockF = document.getElementById("btnLockFiling");
+      if (btnLockF) {{
+        if (lockedFilingScore !== null) {{
+          btnLockF.textContent = isId ? "Buka Kunci Skor Tanggal Pengajuan Saat Ini" : "Unlock the Current Filing Date Score";
+        }} else {{
+          btnLockF.textContent = isId ? "Kunci Skor Tanggal Pengajuan Saat Ini" : "Lock as Current Filing Date Score";
+        }}
+      }}
+      const btnLockP = document.getElementById("btnLockPrior");
+      if (btnLockP) {{
+        if (lockedPriorScore !== null) {{
+          btnLockP.textContent = isId ? "Buka Kunci Skor 1/3 Tahun Sebelumnya" : "Unlock the 1/3-Year Prior Score";
+        }} else {{
+          btnLockP.textContent = isId ? "Kunci Skor 1/3 Tahun Sebelumnya" : "Lock as 1/3-Year Prior Score";
+        }}
+      }}
       const btnResetSide = document.getElementById("btnResetCalcSide"); if (btnResetSide) btnResetSide.textContent = isId ? "Atur Ulang Kalkulator" : "Reset Calculator";
       const lblDualF = document.getElementById("lblDualFiling"); if (lblDualF) lblDualF.textContent = isId ? "Tanggal Pengajuan:" : "Filing Date:";
       const lblDualP = document.getElementById("lblDualPrior"); if (lblDualP) lblDualP.textContent = isId ? "Tanggal Retroaktif:" : "Retroactive Date:";
+
+      const dF = document.getElementById("dualFiling");
+      if (dF) {{
+        dF.textContent = (lockedFilingScore !== null) ? `${{lockedFilingScore}} ${{isId ? 'poin' : 'points'}}` : "-";
+      }}
+      const dP = document.getElementById("dualPrior");
+      if (dP) {{
+        dP.textContent = (lockedPriorScore !== null) ? `${{lockedPriorScore}} ${{isId ? 'poin' : 'points'}}` : "-";
+      }}
+      evaluateDualScores();
 
       const calcFooterNote = document.getElementById("calcFooterNote"); if (calcFooterNote) calcFooterNote.textContent = isId ? "Alat ini beroperasi 100% secara lokal dan offline di peramban Anda untuk penilaian mandiri pribadi. Alat ini tidak memberikan nasihat hukum atau menjamin hasil permohonan." : "This tool operates 100% locally and offline in your browser for personal self-assessment. It does not provide legal advice or guarantee application outcomes.";
       const calcFooterLink = document.getElementById("calcFooterLink"); if (calcFooterLink) calcFooterLink.textContent = isId ? "Referensi Hukum & Penafian Hukum" : "Legal References & Statutory Disclaimer";
@@ -2079,6 +2103,11 @@ html_content = f'''<!DOCTYPE html>
 
       lockedFilingScore = null;
       lockedPriorScore = null;
+      const isId = (currentLang === 'id');
+      const btnLockF = document.getElementById("btnLockFiling");
+      if (btnLockF) btnLockF.textContent = isId ? "Kunci Skor Tanggal Pengajuan Saat Ini" : "Lock as Current Filing Date Score";
+      const btnLockP = document.getElementById("btnLockPrior");
+      if (btnLockP) btnLockP.textContent = isId ? "Kunci Skor 1/3 Tahun Sebelumnya" : "Lock as 1/3-Year Prior Score";
       const dF = document.getElementById("dualFiling");
       if (dF) dF.textContent = "-";
       const dP = document.getElementById("dualPrior");
@@ -2448,16 +2477,36 @@ html_content = f'''<!DOCTYPE html>
 
     function saveFilingDateScore() {{
       const isId = (currentLang === 'id');
-      lockedFilingScore = calculatePoints();
-      document.getElementById("dualFiling").textContent = `${{lockedFilingScore}} ${{isId ? 'poin' : 'points'}}`;
+      const btn = document.getElementById("btnLockFiling");
+      if (lockedFilingScore !== null) {{
+        lockedFilingScore = null;
+        const dF = document.getElementById("dualFiling");
+        if (dF) dF.textContent = "-";
+        if (btn) btn.textContent = isId ? "Kunci Skor Tanggal Pengajuan Saat Ini" : "Lock as Current Filing Date Score";
+      }} else {{
+        lockedFilingScore = calculatePoints();
+        const dF = document.getElementById("dualFiling");
+        if (dF) dF.textContent = `${{lockedFilingScore}} ${{isId ? 'poin' : 'points'}}`;
+        if (btn) btn.textContent = isId ? "Buka Kunci Skor Tanggal Pengajuan Saat Ini" : "Unlock the Current Filing Date Score";
+      }}
       evaluateDualScores();
       saveState();
     }}
 
     function savePriorDateScore() {{
       const isId = (currentLang === 'id');
-      lockedPriorScore = calculatePoints();
-      document.getElementById("dualPrior").textContent = `${{lockedPriorScore}} ${{isId ? 'poin' : 'points'}}`;
+      const btn = document.getElementById("btnLockPrior");
+      if (lockedPriorScore !== null) {{
+        lockedPriorScore = null;
+        const dP = document.getElementById("dualPrior");
+        if (dP) dP.textContent = "-";
+        if (btn) btn.textContent = isId ? "Kunci Skor 1/3 Tahun Sebelumnya" : "Lock as 1/3-Year Prior Score";
+      }} else {{
+        lockedPriorScore = calculatePoints();
+        const dP = document.getElementById("dualPrior");
+        if (dP) dP.textContent = `${{lockedPriorScore}} ${{isId ? 'poin' : 'points'}}`;
+        if (btn) btn.textContent = isId ? "Buka Kunci Skor 1/3 Tahun Sebelumnya" : "Unlock the 1/3-Year Prior Score";
+      }}
       evaluateDualScores();
       saveState();
     }}
@@ -2465,6 +2514,11 @@ html_content = f'''<!DOCTYPE html>
     function evaluateDualScores() {{
       const isId = (currentLang === 'id');
       const verdict = document.getElementById("dualVerdict");
+      if (!verdict) return;
+      if (lockedFilingScore === null && lockedPriorScore === null) {{
+        verdict.textContent = "";
+        return;
+      }}
       if (lockedFilingScore === null || lockedPriorScore === null) {{
         verdict.textContent = isId ? "Kunci kedua titik waktu untuk mengaudit kelayakan berkelanjutan." : "Lock both timestamps to audit continuous eligibility.";
         verdict.style.color = "var(--text-muted)";

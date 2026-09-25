@@ -436,6 +436,96 @@ const idx7to10 = expHtml1b.indexOf("7 – 10 years");
 const idx10plus = expHtml1b.indexOf("More than 10 years");
 assert(idxLess < idx3to5 && idx3to5 < idx5to7 && idx5to7 < idx7to10 && idx7to10 < idx10plus, "Work Experience 1(b) order: Less than 3 -> 3-5 -> 5-7 -> 7-10 -> More than 10", expHtml1b);
 
+// TEST 17: Lock / Unlock Toggle Functionality & Dynamic Button Labels
+vm.runInContext(`
+  // Start from English baseline
+  setLanguage('en');
+  resetCalculator();
+
+  // Initially unlocked
+  btnLockF_init = getEl("btnLockFiling").textContent;
+  btnLockP_init = getEl("btnLockPrior").textContent;
+  dualF_init = getEl("dualFiling").textContent;
+  dualP_init = getEl("dualPrior").textContent;
+
+  // Step 1: Lock Filing Date
+  saveFilingDateScore();
+  lockedF1 = lockedFilingScore;
+  btnLockF_locked = getEl("btnLockFiling").textContent;
+  dualF_locked = getEl("dualFiling").textContent;
+
+  // Step 2: Toggle Unlock Filing Date
+  saveFilingDateScore();
+  lockedF2 = lockedFilingScore;
+  btnLockF_unlocked = getEl("btnLockFiling").textContent;
+  dualF_unlocked = getEl("dualFiling").textContent;
+
+  // Step 3: Lock Prior Date
+  savePriorDateScore();
+  lockedP1 = lockedPriorScore;
+  btnLockP_locked = getEl("btnLockPrior").textContent;
+  dualP_locked = getEl("dualPrior").textContent;
+
+  // Step 4: Toggle Unlock Prior Date
+  savePriorDateScore();
+  lockedP2 = lockedPriorScore;
+  btnLockP_unlocked = getEl("btnLockPrior").textContent;
+  dualP_unlocked = getEl("dualPrior").textContent;
+
+  // Step 5: Test Indonesian toggle labels
+  setLanguage('id');
+  saveFilingDateScore(); // Locks in ID
+  btnLockF_id_locked = getEl("btnLockFiling").textContent;
+  saveFilingDateScore(); // Unlocks in ID
+  btnLockF_id_unlocked = getEl("btnLockFiling").textContent;
+
+  savePriorDateScore(); // Locks in ID
+  btnLockP_id_locked = getEl("btnLockPrior").textContent;
+  savePriorDateScore(); // Unlocks in ID
+  btnLockP_id_unlocked = getEl("btnLockPrior").textContent;
+
+  // Step 6: Reset Calculator restores initial labels and scores
+  saveFilingDateScore(); // Lock it
+  savePriorDateScore(); // Lock it
+  resetCalculator();
+  resetFilingScore = lockedFilingScore;
+  resetPriorScore = lockedPriorScore;
+  btnResetFText = getEl("btnLockFiling").textContent;
+  btnResetPText = getEl("btnLockPrior").textContent;
+
+  // Restore language
+  setLanguage('en');
+`, ctx);
+
+assert(sandbox.btnLockF_init === "Lock as Current Filing Date Score", "Initial Filing Date Button Label", sandbox.btnLockF_init);
+assert(sandbox.btnLockP_init === "Lock as 1/3-Year Prior Score", "Initial Prior Date Button Label", sandbox.btnLockP_init);
+assert(sandbox.dualF_init === "-", "Initial Filing Score is '-'", sandbox.dualF_init);
+assert(sandbox.dualP_init === "-", "Initial Prior Score is '-'", sandbox.dualP_init);
+
+assert(sandbox.lockedF1 !== null, "Filing Date successfully locked", sandbox.lockedF1);
+assert(sandbox.btnLockF_locked === "Unlock the Current Filing Date Score", "Filing Button dynamic label: Unlock the Current Filing Date Score", sandbox.btnLockF_locked);
+assert(sandbox.dualF_locked.includes("points"), "Filing score display updated when locked", sandbox.dualF_locked);
+
+assert(sandbox.lockedF2 === null, "Filing Date successfully unlocked on second click", sandbox.lockedF2);
+assert(sandbox.btnLockF_unlocked === "Lock as Current Filing Date Score", "Filing Button restored label: Lock as Current Filing Date Score", sandbox.btnLockF_unlocked);
+assert(sandbox.dualF_unlocked === "-", "Filing score reset to '-' on unlock", sandbox.dualF_unlocked);
+
+assert(sandbox.lockedP1 !== null, "Prior Date successfully locked", sandbox.lockedP1);
+assert(sandbox.btnLockP_locked === "Unlock the 1/3-Year Prior Score", "Prior Button dynamic label: Unlock the 1/3-Year Prior Score", sandbox.btnLockP_locked);
+assert(sandbox.dualP_locked.includes("points"), "Prior score display updated when locked", sandbox.dualP_locked);
+
+assert(sandbox.lockedP2 === null, "Prior Date successfully unlocked on second click", sandbox.lockedP2);
+assert(sandbox.btnLockP_unlocked === "Lock as 1/3-Year Prior Score", "Prior Button restored label: Lock as 1/3-Year Prior Score", sandbox.btnLockP_unlocked);
+assert(sandbox.dualP_unlocked === "-", "Prior score reset to '-' on unlock", sandbox.dualP_unlocked);
+
+assert(sandbox.btnLockF_id_locked === "Buka Kunci Skor Tanggal Pengajuan Saat Ini", "Indonesian Filing locked label: Buka Kunci Skor Tanggal Pengajuan Saat Ini", sandbox.btnLockF_id_locked);
+assert(sandbox.btnLockF_id_unlocked === "Kunci Skor Tanggal Pengajuan Saat Ini", "Indonesian Filing unlocked label: Kunci Skor Tanggal Pengajuan Saat Ini", sandbox.btnLockF_id_unlocked);
+assert(sandbox.btnLockP_id_locked === "Buka Kunci Skor 1/3 Tahun Sebelumnya", "Indonesian Prior locked label: Buka Kunci Skor 1/3 Tahun Sebelumnya", sandbox.btnLockP_id_locked);
+assert(sandbox.btnLockP_id_unlocked === "Kunci Skor 1/3 Tahun Sebelumnya", "Indonesian Prior unlocked label: Kunci Skor 1/3 Tahun Sebelumnya", sandbox.btnLockP_id_unlocked);
+
+assert(sandbox.resetFilingScore === null && sandbox.resetPriorScore === null, "resetCalculator clears locked scores", `${sandbox.resetFilingScore}, ${sandbox.resetPriorScore}`);
+assert(sandbox.btnResetFText.includes("Kunci") || sandbox.btnResetFText.includes("Lock"), "resetCalculator resets Filing Button label", sandbox.btnResetFText);
+
 console.log(`\n=== FINAL VERIFICATION SUMMARY: ${totalTests} TOTAL TESTS RUN, ${failedTests} FAILURES ===`);
 if (failedTests > 0) {
   process.exit(1);
