@@ -398,6 +398,28 @@ assert(sandbox.degreeLblId === "Gelar Tertinggi yang Dimiliki:", "Indonesian Deg
 assert(sandbox.langStateEn === 'en', "Language state reset to 'en'", sandbox.langStateEn);
 assert(sandbox.titleEn.includes("Self-Diagnostic Checklist"), "English Main Title restored", sandbox.titleEn);
 
+// TEST 16: Professional Experience and Japanese Language Capability Ordering
+const jpMatch = html.match(/<select id="calcJapanese"[^>]*>([\s\S]*?)<\/select>/);
+assert(!!jpMatch, "calcJapanese select tag found in HTML");
+const jpOptions = jpMatch[1];
+const idxNone = jpOptions.indexOf("None");
+const idxN2 = jpOptions.indexOf("JLPT N2");
+const idxN1 = jpOptions.indexOf("JLPT N1");
+assert(idxNone < idxN2 && idxN2 < idxN1, "Japanese Language order: None -> N2 -> N1", `indices: None=${idxNone}, N2=${idxN2}, N1=${idxN1}`);
+
+vm.runInContext(`
+  getEl("calcCategory").value = "1b";
+  handleCategoryChange();
+  expHtml1b = getEl("calcExperience").innerHTML;
+`, ctx);
+const expHtml1b = sandbox.expHtml1b;
+const idxLess = expHtml1b.indexOf("Less than 3 years");
+const idx3to5 = expHtml1b.indexOf("3 – 5 years");
+const idx5to7 = expHtml1b.indexOf("5 – 7 years");
+const idx7to10 = expHtml1b.indexOf("7 – 10 years");
+const idx10plus = expHtml1b.indexOf("More than 10 years");
+assert(idxLess < idx3to5 && idx3to5 < idx5to7 && idx5to7 < idx7to10 && idx7to10 < idx10plus, "Work Experience 1(b) order: Less than 3 -> 3-5 -> 5-7 -> 7-10 -> More than 10", expHtml1b);
+
 console.log(`\n=== FINAL VERIFICATION SUMMARY: ${totalTests} TOTAL TESTS RUN, ${failedTests} FAILURES ===`);
 if (failedTests > 0) {
   process.exit(1);

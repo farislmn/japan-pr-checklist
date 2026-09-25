@@ -990,8 +990,8 @@ html_content = f'''<!DOCTYPE html>
               <label class="form-label" for="calcJapanese" id="labelJapanese">Japanese Language Capability (日本語能力):</label>
               <select id="calcJapanese" class="form-control" onchange="calculatePoints()">
                 <option value="0" selected>None</option>
-                <option value="15">JLPT N1 / BJT 480+ / Foreign University Japanese Major (15 pts)</option>
                 <option value="10">JLPT N2 / BJT 400+ (10 pts - Cannot combine with Japanese University degree)</option>
+                <option value="15">JLPT N1 / BJT 480+ / Foreign University Japanese Major (15 pts)</option>
               </select>
             </div>
 
@@ -1557,6 +1557,20 @@ html_content = f'''<!DOCTYPE html>
       const lblForeign = document.getElementById("labelForeignQual"); if (lblForeign) lblForeign.textContent = isId ? "Memiliki kualifikasi atau penghargaan luar negeri yang diakui oleh Kementerian Kehakiman (外国の資格・表彰 - 告示別表) (+5 poin)" : "Holds foreign qualification or award recognized by MoJ (外国の資格・表彰 - 告示別表) (+5 pts)";
       const lblJpUni = document.getElementById("labelJapanUni"); if (lblJpUni) lblJpUni.textContent = isId ? "Lulusan universitas di Jepang atau menyelesaikan program pascasarjana di Jepang (日本の大学等卒業) (+10 poin)" : "Graduated from a Japanese university or completed Japanese graduate school (日本の大学等卒業) (+10 pts)";
       const lblJpLang = document.getElementById("labelJapanese"); if (lblJpLang) lblJpLang.textContent = isId ? "Kemampuan Bahasa Jepang (日本語能力):" : "Japanese Language Capability (日本語能力):";
+      const jpSel = document.getElementById("calcJapanese");
+      if (jpSel) {{
+        const curJp = jpSel.value;
+        jpSel.innerHTML = isId ? `
+          <option value="0">Tidak Ada</option>
+          <option value="10">JLPT N2 / BJT 400+ (10 poin - Tidak dapat digabung dengan lulusan universitas Jepang)</option>
+          <option value="15">JLPT N1 / BJT 480+ / Jurusan Bahasa Jepang Universitas Luar Negeri (15 poin)</option>
+        ` : `
+          <option value="0">None</option>
+          <option value="10">JLPT N2 / BJT 400+ (10 pts - Cannot combine with Japanese University degree)</option>
+          <option value="15">JLPT N1 / BJT 480+ / Foreign University Japanese Major (15 pts)</option>
+        `;
+        if (curJp) jpSel.value = curJp;
+      }}
       const lblGrowth = document.getElementById("labelGrowthField"); if (lblGrowth) lblGrowth.textContent = isId ? "Bekerja di bidang bisnis mutakhir di sektor pertumbuhan yang diakui Kementerian Kehakiman (先端事業従事) (+10 poin)" : "Engaged in advanced businesses in growth areas recognized by MoJ (先端事業従事 - 環境省推進費等) (+10 pts)";
       const lblTopUni = document.getElementById("labelTopUni"); if (lblTopUni) lblTopUni.textContent = isId ? "Lulusan Universitas Peringkat Teratas Dunia (QS/THE/ARWU Top 300, SGU Tipe A/B) (+10 poin)" : "Graduated from a Top-Ranked University (QS/THE/ARWU Top 300, SGU Type A/B) (+10 pts)";
       const lblJica = document.getElementById("labelJica"); if (lblJica) lblJica.textContent = isId ? "Menyelesaikan program pelatihan JICA (JICA研修等修了) (+5 poin)" : "Completed JICA training program (JICA研修等修了) (+5 pts)";
@@ -2059,6 +2073,8 @@ html_content = f'''<!DOCTYPE html>
       if (licSel) licSel.value = "0";
       const posSel = document.getElementById("calcPosition1c");
       if (posSel) posSel.value = "0";
+      const jpSel = document.getElementById("calcJapanese");
+      if (jpSel) jpSel.value = "0";
 
       lockedFilingScore = null;
       lockedPriorScore = null;
@@ -2143,51 +2159,53 @@ html_content = f'''<!DOCTYPE html>
 
       // Experience options
       const expSel = document.getElementById("calcExperience");
+      const curExp = expSel.value;
       expSel.innerHTML = "";
       if (cat === "1a") {{
         document.getElementById("expSubtitle").textContent = isId ? "Penelitian, bimbingan riset, atau praktik pendidikan" : "Research, research instruction, or educational practice";
         expSel.innerHTML = isId ? `
           <option value="0" selected>Kurang dari 3 tahun</option>
+          <option value="5">3 – 5 tahun (5 poin)</option>
+          <option value="10">5 – 7 tahun (10 poin)</option>
           <option value="15">7 tahun atau lebih (15 poin)</option>
-          <option value="10">5 tahun hingga kurang dari 7 tahun (10 poin)</option>
-          <option value="5">3 tahun hingga kurang dari 5 tahun (5 poin)</option>
         ` : `
           <option value="0" selected>Less than 3 years</option>
+          <option value="5">3 – 5 years (5 pts)</option>
+          <option value="10">5 – 7 years (10 pts)</option>
           <option value="15">7 years or more (15 pts)</option>
-          <option value="10">5 years to less than 7 years (10 pts)</option>
-          <option value="5">3 years to less than 5 years (5 pts)</option>
         `;
       }} else if (cat === "1b") {{
         document.getElementById("expSubtitle").textContent = isId ? "Pengalaman praktis dalam tugas teknis/keahlian khusus yang diajukan" : "Practical experience in engaging technical/specialized duties";
         expSel.innerHTML = isId ? `
           <option value="0" selected>Kurang dari 3 tahun</option>
-          <option value="20">10 tahun atau lebih (20 poin)</option>
-          <option value="15">7 tahun hingga kurang dari 10 tahun (15 poin)</option>
-          <option value="10">5 tahun hingga kurang dari 7 tahun (10 poin)</option>
-          <option value="5">3 tahun hingga kurang dari 5 tahun (5 poin)</option>
+          <option value="5">3 – 5 tahun (5 poin)</option>
+          <option value="10">5 – 7 tahun (10 poin)</option>
+          <option value="15">7 – 10 tahun (15 poin)</option>
+          <option value="20">Lebih dari 10 tahun (20 poin)</option>
         ` : `
           <option value="0" selected>Less than 3 years</option>
-          <option value="20">10 years or more (20 pts)</option>
-          <option value="15">7 years to less than 10 years (15 pts)</option>
-          <option value="10">5 years to less than 7 years (10 pts)</option>
-          <option value="5">3 years to less than 5 years (5 pts)</option>
+          <option value="5">3 – 5 years (5 pts)</option>
+          <option value="10">5 – 7 years (10 pts)</option>
+          <option value="15">7 – 10 years (15 pts)</option>
+          <option value="20">More than 10 years (20 pts)</option>
         `;
       }} else if (cat === "1c") {{
         document.getElementById("expSubtitle").textContent = isId ? "Pengalaman praktis dalam manajemen bisnis atau administrasi" : "Practical experience in business management or administration";
         expSel.innerHTML = isId ? `
           <option value="0" selected>Kurang dari 3 tahun</option>
-          <option value="25">10 tahun atau lebih (25 poin)</option>
-          <option value="20">7 tahun hingga kurang dari 10 tahun (20 poin)</option>
-          <option value="15">5 tahun hingga kurang dari 7 tahun (15 poin)</option>
-          <option value="10">3 tahun hingga kurang dari 5 tahun (10 poin)</option>
+          <option value="10">3 – 5 tahun (10 poin)</option>
+          <option value="15">5 – 7 tahun (15 poin)</option>
+          <option value="20">7 – 10 tahun (20 poin)</option>
+          <option value="25">Lebih dari 10 tahun (25 poin)</option>
         ` : `
           <option value="0" selected>Less than 3 years</option>
-          <option value="25">10 years or more (25 pts)</option>
-          <option value="20">7 years to less than 10 years (20 pts)</option>
-          <option value="15">5 years to less than 7 years (15 pts)</option>
-          <option value="10">3 years to less than 5 years (10 pts)</option>
+          <option value="10">3 – 5 years (10 pts)</option>
+          <option value="15">5 – 7 years (15 pts)</option>
+          <option value="20">7 – 10 years (20 pts)</option>
+          <option value="25">More than 10 years (25 pts)</option>
         `;
       }}
+      if (curExp) expSel.value = curExp;
 
       // Age controls
       if (cat === "1c") {{
