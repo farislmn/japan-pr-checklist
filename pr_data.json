@@ -98,7 +98,7 @@
       "legal_rule_en": "The applicant must have scored at least 80 points on the Highly Skilled Professional points matrix as of 1 year prior to the application date, and must have continuously maintained 80 or more points up to the filing date.",
       "failure_mode_en": "Immediate denial if the applicant has 80+ points today but scored below 80 points as of 1 year prior (points must be held continuously for the entire 1-year lookback).",
       "category_id": "Jalur HSP 80 Poin (高度専門職80点)",
-      "law_title_id": "Pedoman Izin Tinggal Tetap Bagian 2(7); Peraturan Kementerian Kehakiman No. 426M60000010037",
+      "law_title_id": "Pedoman Izin Tinggal Tetap Bagian 2(7); Peraturan Kementerian Kehakiman No. 37 Tahun 2014",
       "legal_rule_id": "Telah tinggal secara terus-menerus di Jepang selama 1 tahun atau lebih dengan mempertahankan skor 80 poin atau lebih dalam tabel evaluasi poin Tenaga Kerja Ahli Tingkat Lanjut (HSP) pada tanggal pengajuan dan 1 tahun sebelumnya.",
       "failure_mode_id": "Penolakan jika skor poin pada tanggal pengajuan atau pada titik patokan 1 tahun sebelumnya turun di bawah 80 poin."
     },
@@ -115,7 +115,7 @@
       "legal_rule_en": "The applicant must have scored at least 70 points on the Highly Skilled Professional points matrix as of 3 years prior to the application date, and must have continuously maintained 70 or more points up to the filing date.",
       "failure_mode_en": "Denial if points dropped below 70 at any point between 3 years prior and the filing date (points must be held continuously for the entire 3-year lookback).",
       "category_id": "Jalur HSP 70 Poin (高度専門職70点)",
-      "law_title_id": "Pedoman Izin Tinggal Tetap Bagian 2(6); Peraturan Kementerian Kehakiman No. 426M60000010037",
+      "law_title_id": "Pedoman Izin Tinggal Tetap Bagian 2(6); Peraturan Kementerian Kehakiman No. 37 Tahun 2014",
       "legal_rule_id": "Telah tinggal secara terus-menerus di Jepang selama 3 tahun atau lebih dengan mempertahankan skor 70 poin atau lebih dalam tabel evaluasi poin Tenaga Kerja Ahli Tingkat Lanjut (HSP) pada tanggal pengajuan dan 3 tahun sebelumnya.",
       "failure_mode_id": "Penolakan jika skor poin pada tanggal pengajuan atau pada titik patokan 3 tahun sebelumnya turun di bawah 70 poin."
     },

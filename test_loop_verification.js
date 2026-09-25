@@ -273,14 +273,6 @@ const g2Pass = getEl("simGate2Badge").textContent;
 assert(g1Pass.includes("PASSED"), "Reform Simulator Gate 1 Passed with ¥8M", g1Pass);
 assert(g2Pass.includes("PASSED"), "Reform Simulator Gate 2 Passed with ¥8M", g2Pass);
 
-// Summary
-console.log(`=== SUMMARY: ${totalTests} TOTAL TESTS RUN, ${failedTests} FAILURES ===`);
-if (failedTests > 0) {
-  process.exit(1);
-} else {
-  console.log("ZERO ERRORS ACHIEVED ACROSS ALL TEST SUITES.");
-}
-
 // TEST 10: Japanese University Degree + N2 vs N1 Mutual Exclusivity Rule
 vm.runInContext(`
   getEl("calcCategory").value = "1b";
@@ -329,29 +321,46 @@ vm.runInContext(`
 assert(sandbox.rdVisibleWithLarge === "none", "SME R&D hidden for Large Enterprise", sandbox.rdVisibleWithLarge);
 assert(sandbox.rdVisibleWithSme === "flex" || sandbox.rdVisibleWithSme === "block", "SME R&D visible for SME", sandbox.rdVisibleWithSme);
 
-// TEST 12: Dual Timestamp Continuous Audit Logic
+// TEST 12: Dual Timestamp Audit — 80-point route uses the 1-year prior score, 70-point route the 3-year prior score
 vm.runInContext(`
-  // Case 1: 85 now, 85 prior -> 80-point qualified
-  lockedFilingScore = 85;
-  lockedPriorScore = 85;
+  lockedFilingScore = 85; lockedPrior1Score = 85; lockedPrior3Score = null;
   evaluateDualScores();
-  verdict1 = getEl("dualVerdict").innerHTML;
+  verdict1 = getEl("dualVerdict").textContent;
 
-  // Case 2: 85 now, 65 prior -> not yet 1 year maintained
-  lockedFilingScore = 85;
-  lockedPriorScore = 65;
+  lockedFilingScore = 85; lockedPrior1Score = 65; lockedPrior3Score = null;
   evaluateDualScores();
-  verdict2 = getEl("dualVerdict").innerHTML;
+  verdict2 = getEl("dualVerdict").textContent;
 
-  // Case 3: 75 now, 75 prior -> 70-point qualified
-  lockedFilingScore = 75;
-  lockedPriorScore = 75;
+  lockedFilingScore = 75; lockedPrior1Score = null; lockedPrior3Score = 75;
   evaluateDualScores();
-  verdict3 = getEl("dualVerdict").innerHTML;
+  verdict3 = getEl("dualVerdict").textContent;
+
+  // 80+ one year ago does not prove 70+ three years ago
+  lockedFilingScore = 75; lockedPrior1Score = 90; lockedPrior3Score = 60;
+  evaluateDualScores();
+  verdict4 = getEl("dualVerdict").textContent;
+
+  // 1-year prior below 80 but 3-year prior 70+ -> falls back to the 70-point route
+  lockedFilingScore = 85; lockedPrior1Score = 75; lockedPrior3Score = 72;
+  evaluateDualScores();
+  verdict5 = getEl("dualVerdict").textContent;
+
+  lockedFilingScore = 65; lockedPrior1Score = 90; lockedPrior3Score = 90;
+  evaluateDualScores();
+  verdict6 = getEl("dualVerdict").textContent;
+
+  lockedFilingScore = null; lockedPrior1Score = 90; lockedPrior3Score = null;
+  evaluateDualScores();
+  verdict7 = getEl("dualVerdict").textContent;
+  lockedFilingScore = null; lockedPrior1Score = null; lockedPrior3Score = null;
 `, ctx);
-assert(sandbox.verdict1.includes("Qualified for 80-Point"), "Dual Audit: 80+ maintained", sandbox.verdict1);
-assert(sandbox.verdict2.includes("must maintain 80+ points for a full 1 year"), "Dual Audit: 80+ not maintained for 1 year", sandbox.verdict2);
-assert(sandbox.verdict3.includes("Qualified for 70-Point"), "Dual Audit: 70+ maintained", sandbox.verdict3);
+assert(sandbox.verdict1.includes("Qualified for 80-Point"), "Dual Audit: 80+ at filing and 1 year before", sandbox.verdict1);
+assert(sandbox.verdict2.includes("below 80") && sandbox.verdict2.includes("3-year prior"), "Dual Audit: 1-year prior below 80 asks for the 3-year prior score", sandbox.verdict2);
+assert(sandbox.verdict3.includes("Qualified for 70-Point"), "Dual Audit: 70+ at filing and 3 years before", sandbox.verdict3);
+assert(sandbox.verdict4.includes("Disqualified") && sandbox.verdict4.includes("3-year prior score is below 70"), "Dual Audit: 1-year prior score cannot stand in for the 3-year prior", sandbox.verdict4);
+assert(sandbox.verdict5.includes("Qualified for 70-Point"), "Dual Audit: falls back to the 70-point route", sandbox.verdict5);
+assert(sandbox.verdict6.includes("Disqualified") && sandbox.verdict6.includes("below 70"), "Dual Audit: filing score below 70 disqualifies", sandbox.verdict6);
+assert(sandbox.verdict7.includes("Lock the filing date score"), "Dual Audit: filing score required first", sandbox.verdict7);
 
 // TEST 13: J-Skip Track 1 & Track 2 Switching
 elements['jskip_track_val'] = 't1';
@@ -372,7 +381,7 @@ assert(sandbox.jskipValNone === "—", "J-Skip None displays dash", sandbox.jski
 
 // TEST 14: 2026 Reform Gate 1 Scaling for Large Households & Dependents
 vm.runInContext(`
-  getEl("simBenchmark").value = "kiso_all"; // 5.752M floor
+  getEl("simBenchmark").value = "by_size";
   getEl("simHhSize").value = "5";
   getEl("simHhAbroad").value = "0";
   getEl("simIncome").value = "850"; // 8.5M
@@ -385,7 +394,7 @@ vm.runInContext(`
   detail5p = getEl("simGate1Detail").textContent;
   badge5p = getEl("simGate1Badge").textContent;
 `, ctx);
-assert(sandbox.detail5p.includes("Required Bar: ¥833.2万"), "Household size 5 bar calculation (¥8.332M)", sandbox.detail5p);
+assert(sandbox.detail5p.includes("Required Bar: 833.2万円"), "Household size 5 bar calculation (¥8.332M)", sandbox.detail5p);
 assert(sandbox.badge5p.includes("PASSED"), "Household size 5 passed with ¥8.5M", sandbox.badge5p);
 
 // TEST 15: Language Switcher and Bilingual Verification
@@ -438,93 +447,227 @@ assert(idxLess < idx3to5 && idx3to5 < idx5to7 && idx5to7 < idx7to10 && idx7to10 
 
 // TEST 17: Lock / Unlock Toggle Functionality & Dynamic Button Labels
 vm.runInContext(`
-  // Start from English baseline
   setLanguage('en');
   resetCalculator();
-
-  // Initially unlocked
+  getEl("calcCategory").value = "1b";
+  handleCategoryChange();
   btnLockF_init = getEl("btnLockFiling").textContent;
-  btnLockP_init = getEl("btnLockPrior").textContent;
+  btnLockP1_init = getEl("btnLockPrior1").textContent;
+  btnLockP3_init = getEl("btnLockPrior3").textContent;
   dualF_init = getEl("dualFiling").textContent;
-  dualP_init = getEl("dualPrior").textContent;
+  dualP1_init = getEl("dualPrior1").textContent;
+  dualP3_init = getEl("dualPrior3").textContent;
 
-  // Step 1: Lock Filing Date
   saveFilingDateScore();
   lockedF1 = lockedFilingScore;
   btnLockF_locked = getEl("btnLockFiling").textContent;
   dualF_locked = getEl("dualFiling").textContent;
-
-  // Step 2: Toggle Unlock Filing Date
   saveFilingDateScore();
   lockedF2 = lockedFilingScore;
   btnLockF_unlocked = getEl("btnLockFiling").textContent;
   dualF_unlocked = getEl("dualFiling").textContent;
 
-  // Step 3: Lock Prior Date
-  savePriorDateScore();
-  lockedP1 = lockedPriorScore;
-  btnLockP_locked = getEl("btnLockPrior").textContent;
-  dualP_locked = getEl("dualPrior").textContent;
+  savePriorDateScore(1);
+  lockedP1a = lockedPrior1Score;
+  lockedP3untouched = lockedPrior3Score;
+  btnLockP1_locked = getEl("btnLockPrior1").textContent;
+  dualP1_locked = getEl("dualPrior1").textContent;
+  savePriorDateScore(1);
+  lockedP1b = lockedPrior1Score;
+  btnLockP1_unlocked = getEl("btnLockPrior1").textContent;
+  dualP1_unlocked = getEl("dualPrior1").textContent;
 
-  // Step 4: Toggle Unlock Prior Date
-  savePriorDateScore();
-  lockedP2 = lockedPriorScore;
-  btnLockP_unlocked = getEl("btnLockPrior").textContent;
-  dualP_unlocked = getEl("dualPrior").textContent;
+  savePriorDateScore(3);
+  lockedP3a = lockedPrior3Score;
+  btnLockP3_locked = getEl("btnLockPrior3").textContent;
+  savePriorDateScore(3);
+  lockedP3b = lockedPrior3Score;
+  btnLockP3_unlocked = getEl("btnLockPrior3").textContent;
 
-  // Step 5: Test Indonesian toggle labels
   setLanguage('id');
-  saveFilingDateScore(); // Locks in ID
+  saveFilingDateScore();
   btnLockF_id_locked = getEl("btnLockFiling").textContent;
-  saveFilingDateScore(); // Unlocks in ID
+  saveFilingDateScore();
   btnLockF_id_unlocked = getEl("btnLockFiling").textContent;
+  savePriorDateScore(1);
+  btnLockP1_id_locked = getEl("btnLockPrior1").textContent;
+  savePriorDateScore(1);
+  btnLockP1_id_unlocked = getEl("btnLockPrior1").textContent;
+  savePriorDateScore(3);
+  btnLockP3_id_locked = getEl("btnLockPrior3").textContent;
+  savePriorDateScore(3);
 
-  savePriorDateScore(); // Locks in ID
-  btnLockP_id_locked = getEl("btnLockPrior").textContent;
-  savePriorDateScore(); // Unlocks in ID
-  btnLockP_id_unlocked = getEl("btnLockPrior").textContent;
-
-  // Step 6: Reset Calculator restores initial labels and scores
-  saveFilingDateScore(); // Lock it
-  savePriorDateScore(); // Lock it
+  saveFilingDateScore();
+  savePriorDateScore(1);
+  savePriorDateScore(3);
   resetCalculator();
-  resetFilingScore = lockedFilingScore;
-  resetPriorScore = lockedPriorScore;
+  resetScores = [lockedFilingScore, lockedPrior1Score, lockedPrior3Score];
   btnResetFText = getEl("btnLockFiling").textContent;
-  btnResetPText = getEl("btnLockPrior").textContent;
-
-  // Restore language
   setLanguage('en');
 `, ctx);
-
 assert(sandbox.btnLockF_init === "Lock as Current Filing Date Score", "Initial Filing Date Button Label", sandbox.btnLockF_init);
-assert(sandbox.btnLockP_init === "Lock as 1/3-Year Prior Score", "Initial Prior Date Button Label", sandbox.btnLockP_init);
-assert(sandbox.dualF_init === "-", "Initial Filing Score is '-'", sandbox.dualF_init);
-assert(sandbox.dualP_init === "-", "Initial Prior Score is '-'", sandbox.dualP_init);
-
-assert(sandbox.lockedF1 !== null, "Filing Date successfully locked", sandbox.lockedF1);
-assert(sandbox.btnLockF_locked === "Unlock the Current Filing Date Score", "Filing Button dynamic label: Unlock the Current Filing Date Score", sandbox.btnLockF_locked);
+assert(sandbox.btnLockP1_init === "Lock as 1-Year Prior Score", "Initial 1-Year Prior Button Label", sandbox.btnLockP1_init);
+assert(sandbox.btnLockP3_init === "Lock as 3-Year Prior Score", "Initial 3-Year Prior Button Label", sandbox.btnLockP3_init);
+assert(sandbox.dualF_init === "-" && sandbox.dualP1_init === "-" && sandbox.dualP3_init === "-", "Initial locked scores are '-'", `${sandbox.dualF_init} ${sandbox.dualP1_init} ${sandbox.dualP3_init}`);
+assert(typeof sandbox.lockedF1 === "number", "Filing Date successfully locked", sandbox.lockedF1);
+assert(sandbox.btnLockF_locked === "Unlock the Current Filing Date Score", "Filing Button dynamic label when locked", sandbox.btnLockF_locked);
 assert(sandbox.dualF_locked.includes("points"), "Filing score display updated when locked", sandbox.dualF_locked);
-
-assert(sandbox.lockedF2 === null, "Filing Date successfully unlocked on second click", sandbox.lockedF2);
-assert(sandbox.btnLockF_unlocked === "Lock as Current Filing Date Score", "Filing Button restored label: Lock as Current Filing Date Score", sandbox.btnLockF_unlocked);
+assert(sandbox.lockedF2 === null, "Filing Date unlocked on second click", sandbox.lockedF2);
+assert(sandbox.btnLockF_unlocked === "Lock as Current Filing Date Score", "Filing Button label restored on unlock", sandbox.btnLockF_unlocked);
 assert(sandbox.dualF_unlocked === "-", "Filing score reset to '-' on unlock", sandbox.dualF_unlocked);
-
-assert(sandbox.lockedP1 !== null, "Prior Date successfully locked", sandbox.lockedP1);
-assert(sandbox.btnLockP_locked === "Unlock the 1/3-Year Prior Score", "Prior Button dynamic label: Unlock the 1/3-Year Prior Score", sandbox.btnLockP_locked);
-assert(sandbox.dualP_locked.includes("points"), "Prior score display updated when locked", sandbox.dualP_locked);
-
-assert(sandbox.lockedP2 === null, "Prior Date successfully unlocked on second click", sandbox.lockedP2);
-assert(sandbox.btnLockP_unlocked === "Lock as 1/3-Year Prior Score", "Prior Button restored label: Lock as 1/3-Year Prior Score", sandbox.btnLockP_unlocked);
-assert(sandbox.dualP_unlocked === "-", "Prior score reset to '-' on unlock", sandbox.dualP_unlocked);
-
-assert(sandbox.btnLockF_id_locked === "Buka Kunci Skor Tanggal Pengajuan Saat Ini", "Indonesian Filing locked label: Buka Kunci Skor Tanggal Pengajuan Saat Ini", sandbox.btnLockF_id_locked);
-assert(sandbox.btnLockF_id_unlocked === "Kunci Skor Tanggal Pengajuan Saat Ini", "Indonesian Filing unlocked label: Kunci Skor Tanggal Pengajuan Saat Ini", sandbox.btnLockF_id_unlocked);
-assert(sandbox.btnLockP_id_locked === "Buka Kunci Skor 1/3 Tahun Sebelumnya", "Indonesian Prior locked label: Buka Kunci Skor 1/3 Tahun Sebelumnya", sandbox.btnLockP_id_locked);
-assert(sandbox.btnLockP_id_unlocked === "Kunci Skor 1/3 Tahun Sebelumnya", "Indonesian Prior unlocked label: Kunci Skor 1/3 Tahun Sebelumnya", sandbox.btnLockP_id_unlocked);
-
-assert(sandbox.resetFilingScore === null && sandbox.resetPriorScore === null, "resetCalculator clears locked scores", `${sandbox.resetFilingScore}, ${sandbox.resetPriorScore}`);
+assert(typeof sandbox.lockedP1a === "number", "1-Year Prior successfully locked", sandbox.lockedP1a);
+assert(sandbox.lockedP3untouched === null, "Locking the 1-year prior leaves the 3-year prior untouched", sandbox.lockedP3untouched);
+assert(sandbox.btnLockP1_locked === "Unlock the 1-Year Prior Score", "1-Year Prior Button dynamic label when locked", sandbox.btnLockP1_locked);
+assert(sandbox.dualP1_locked.includes("points"), "1-Year Prior score display updated when locked", sandbox.dualP1_locked);
+assert(sandbox.lockedP1b === null, "1-Year Prior unlocked on second click", sandbox.lockedP1b);
+assert(sandbox.btnLockP1_unlocked === "Lock as 1-Year Prior Score", "1-Year Prior Button label restored", sandbox.btnLockP1_unlocked);
+assert(sandbox.dualP1_unlocked === "-", "1-Year Prior score reset to '-' on unlock", sandbox.dualP1_unlocked);
+assert(typeof sandbox.lockedP3a === "number" && sandbox.lockedP3b === null, "3-Year Prior lock toggles", `${sandbox.lockedP3a}, ${sandbox.lockedP3b}`);
+assert(sandbox.btnLockP3_locked === "Unlock the 3-Year Prior Score" && sandbox.btnLockP3_unlocked === "Lock as 3-Year Prior Score", "3-Year Prior Button labels", `${sandbox.btnLockP3_locked} / ${sandbox.btnLockP3_unlocked}`);
+assert(sandbox.btnLockF_id_locked === "Buka Kunci Skor Tanggal Pengajuan Saat Ini", "Indonesian Filing locked label", sandbox.btnLockF_id_locked);
+assert(sandbox.btnLockF_id_unlocked === "Kunci Skor Tanggal Pengajuan Saat Ini", "Indonesian Filing unlocked label", sandbox.btnLockF_id_unlocked);
+assert(sandbox.btnLockP1_id_locked === "Buka Kunci Skor 1 Tahun Sebelumnya", "Indonesian 1-Year Prior locked label", sandbox.btnLockP1_id_locked);
+assert(sandbox.btnLockP1_id_unlocked === "Kunci Skor 1 Tahun Sebelumnya", "Indonesian 1-Year Prior unlocked label", sandbox.btnLockP1_id_unlocked);
+assert(sandbox.btnLockP3_id_locked === "Buka Kunci Skor 3 Tahun Sebelumnya", "Indonesian 3-Year Prior locked label", sandbox.btnLockP3_id_locked);
+assert(sandbox.resetScores.every(v => v === null), "resetCalculator clears all locked scores", JSON.stringify(sandbox.resetScores));
 assert(sandbox.btnResetFText.includes("Kunci") || sandbox.btnResetFText.includes("Lock"), "resetCalculator resets Filing Button label", sandbox.btnResetFText);
+
+// TEST 18: Only one reset button in the calculator
+assert(!html.includes('id="calcBtnResetTop"'), "Top calculator reset button removed", "calcBtnResetTop still present");
+assert((html.match(/onclick="resetCalculator\(\)"/g) || []).length === 1, "Exactly one Reset Calculator button", (html.match(/onclick="resetCalculator\(\)"/g) || []).length);
+
+// TEST 19: ¥3M salary floor disqualifies 1(b)/1(c) but not 1(a)
+vm.runInContext(`
+  resetCalculator();
+  getEl("calcCategory").value = "1b";
+  getEl("calcDegree").value = "30";
+  getEl("calcExperience").value = "20";
+  getEl("calcAge").value = "15";
+  getEl("calcSalary").value = "disqualify";
+  getEl("calcJapanUni").checked = true;
+  getEl("calcJapanese").value = "15";
+  under3m_1b = calculatePoints();
+  under3m_1b_status = getEl("scoreStatus").textContent;
+  under3m_1b_alert = getEl("salaryAlertMin").style.display;
+
+  getEl("calcCategory").value = "1c";
+  getEl("calcSalary").value = "disqualify";
+  under3m_1c = calculatePoints();
+
+  getEl("calcCategory").value = "1a";
+  getEl("calcExperience").value = "15";
+  getEl("calcSalary").value = "under3m";
+  under3m_1a = calculatePoints();
+  under3m_1a_alert = getEl("salaryAlertMin").style.display;
+  under3m_1a_status = getEl("scoreStatus").textContent;
+  resetCalculator();
+`, ctx);
+assert(sandbox.under3m_1b === 0, "1(b) under ¥3M scores 0", sandbox.under3m_1b);
+assert(sandbox.under3m_1b_status.includes("Not Eligible"), "1(b) under ¥3M shows Not Eligible", sandbox.under3m_1b_status);
+assert(sandbox.under3m_1b_alert === "block", "1(b) under ¥3M shows the salary alert", sandbox.under3m_1b_alert);
+assert(sandbox.under3m_1c === 0, "1(c) under ¥3M scores 0", sandbox.under3m_1c);
+assert(sandbox.under3m_1a === 30 + 15 + 15 + 10 + 15, "1(a) under ¥3M only loses salary points", sandbox.under3m_1a);
+assert(sandbox.under3m_1a_alert === "none" && !sandbox.under3m_1a_status.includes("Not Eligible"), "1(a) has no ¥3M floor", `${sandbox.under3m_1a_alert} / ${sandbox.under3m_1a_status}`);
+const salOpts1a = (() => { vm.runInContext(`getEl("calcCategory").value = "1a"; handleCategoryChange(); salHtml1a = getEl("calcSalary").innerHTML; getEl("calcCategory").value = "1b"; handleCategoryChange(); salHtml1b = getEl("calcSalary").innerHTML;`, ctx); return [sandbox.salHtml1a, sandbox.salHtml1b]; })();
+assert(salOpts1a[0].includes('value="under3m"') && !salOpts1a[0].includes('value="disqualify"'), "1(a) salary list has a 0-pt under-¥3M option", salOpts1a[0].slice(0, 120));
+assert(salOpts1a[1].includes('value="disqualify"'), "1(b) salary list keeps the disqualifying under-¥3M option", salOpts1a[1].slice(0, 120));
+
+// TEST 20: 1(c) has no research-achievement points
+vm.runInContext(`
+  resetCalculator();
+  getEl("calcCategory").value = "1c";
+  handleCategoryChange();
+  research1cDisplay = getEl("cardResearch").style.display;
+  getEl("resPatent").checked = true;
+  getEl("resPapers").checked = true;
+  calculatePoints();
+  research1c = +getEl("subResearch").textContent;
+  getEl("calcCategory").value = "1b";
+  handleCategoryChange();
+  research1bDisplay = getEl("cardResearch").style.display;
+  calculatePoints();
+  research1b = +getEl("subResearch").textContent;
+  resetCalculator();
+`, ctx);
+assert(sandbox.research1c === 0, "1(c) research achievements score 0", sandbox.research1c);
+assert(sandbox.research1cDisplay === "none", "1(c) research card hidden", sandbox.research1cDisplay);
+assert(sandbox.research1b === 15 && sandbox.research1bDisplay === "block", "1(b) research achievements still 15 pts", `${sandbox.research1b} / ${sandbox.research1bDisplay}`);
+
+// TEST 21: Household income bar follows household size by default
+vm.runInContext(`
+  getEl("simBenchmark").value = "by_size";
+  getEl("simHhAbroad").value = "0";
+  getEl("simIncome").value = "400";
+  getEl("simSpouseIncome").value = "0";
+  getEl("simFamIncome").value = "0";
+  getEl("simHhSize").value = "1"; runReformSimulation(); bar1 = getEl("simGate1Detail").textContent; badge1 = getEl("simGate1Badge").textContent;
+  getEl("simHhSize").value = "2"; runReformSimulation(); bar2 = getEl("simGate1Detail").textContent;
+  getEl("simHhSize").value = "3"; getEl("simHhAbroad").value = "2"; runReformSimulation(); barAbroad = getEl("simGate1Detail").textContent;
+  getEl("simHhAbroad").value = "0";
+  getEl("simBenchmark").value = "kiso_all"; getEl("simHhSize").value = "1"; runReformSimulation(); barFlat = getEl("simGate1Detail").textContent;
+  getEl("simBenchmark").value = "by_size";
+`, ctx);
+assert(sandbox.bar1.includes("Required Bar: 318.3万円"), "1-person household bar is ¥3.183M", sandbox.bar1);
+assert(sandbox.badge1.includes("PASSED"), "1-person household with ¥4M passes", sandbox.badge1);
+assert(sandbox.bar2.includes("Required Bar: 475.6万円"), "2-person household bar is ¥4.756M", sandbox.bar2);
+assert(sandbox.barAbroad.includes("Required Bar: 833.2万円") && sandbox.barAbroad.includes("5-person"), "Overseas dependents added to household size", sandbox.barAbroad);
+assert(sandbox.barFlat.includes("Required Bar: 575.2万円"), "Flat benchmark used as-is", sandbox.barFlat);
+
+// TEST 22: State validation for saved and imported backups
+vm.runInContext(`
+  currentLang = "en"; currentRoute = "10-Year Standard Route"; checklistAnswers = {};
+  lockedFilingScore = null; lockedPrior1Score = null; lockedPrior3Score = null;
+  firstNum = String(ROUTE_ITEMS["10-Year Standard Route"][0].num);
+  badOk = applyState({
+    currentLang: "fr",
+    currentRoute: "Nonexistent Route",
+    checklistAnswers: { "10-Year Standard Route": { [firstNum]: "YES", "999": "YES", [String(ROUTE_ITEMS["10-Year Standard Route"][1].num)]: "<img>" }, "Fake": { "1": "YES" } },
+    lockedFilingScore: "80",
+    lockedPrior1Score: 82,
+    lockedPrior3Score: -5
+  });
+  st_lang = currentLang; st_route = currentRoute;
+  st_answers = JSON.stringify(checklistAnswers);
+  st_scores = [lockedFilingScore, lockedPrior1Score, lockedPrior3Score];
+  rejectArray = applyState([1, 2]);
+  rejectNull = applyState(null);
+  goodOk = applyState({ currentLang: "id", currentRoute: "Spouse of Japanese or PR" });
+  st_lang2 = currentLang; st_route2 = currentRoute;
+  currentLang = "en"; currentRoute = "10-Year Standard Route"; checklistAnswers = {};
+  lockedFilingScore = null; lockedPrior1Score = null; lockedPrior3Score = null;
+`, ctx);
+assert(sandbox.badOk === true && sandbox.st_lang === "en" && sandbox.st_route === "10-Year Standard Route", "Invalid language and route ignored", `${sandbox.st_lang} ${sandbox.st_route}`);
+assert(sandbox.st_answers === JSON.stringify({ "10-Year Standard Route": { [sandbox.firstNum]: "YES" } }), "Only valid checklist answers kept", sandbox.st_answers);
+assert(sandbox.st_scores[0] === null && sandbox.st_scores[1] === 82 && sandbox.st_scores[2] === null, "Only numeric non-negative locked scores kept", JSON.stringify(sandbox.st_scores));
+assert(sandbox.rejectArray === false && sandbox.rejectNull === false, "Non-object backups rejected", `${sandbox.rejectArray} ${sandbox.rejectNull}`);
+assert(sandbox.goodOk === true && sandbox.st_lang2 === "id" && sandbox.st_route2 === "Spouse of Japanese or PR", "Valid language and route applied", `${sandbox.st_lang2} ${sandbox.st_route2}`);
+
+// TEST 23: Calculator inputs are saved and restored
+vm.runInContext(`
+  setLanguage('en');
+  resetCalculator();
+  getEl("calcCategory").value = "1b";
+  handleCategoryChange();
+  getEl("calcDegree").value = "30";
+  getEl("calcSalary").value = "40";
+  getEl("calcTopUni").checked = true;
+  calculatePoints();
+  snapshot = JSON.parse(localStorage.getItem("japan_pr_state")).calcInputs;
+  resetCalculator();
+  restoreCalcInputs(snapshot);
+  restoredDeg = getEl("calcDegree").value;
+  restoredSal = getEl("calcSalary").value;
+  restoredTop = getEl("calcTopUni").checked;
+  resetCalculator();
+`, ctx);
+assert(sandbox.snapshot && sandbox.snapshot.category === "1b" && sandbox.snapshot.selects.calcDegree === "30", "Calculator inputs saved to state", JSON.stringify(sandbox.snapshot));
+assert(sandbox.restoredDeg === "30" && sandbox.restoredSal === "40" && sandbox.restoredTop === true, "Calculator inputs restored", `${sandbox.restoredDeg} ${sandbox.restoredSal} ${sandbox.restoredTop}`);
+
+// TEST 24: Removed dead code and relabeled external link
+assert(!html.includes("TEST_SUITE"), "Unused in-page TEST_SUITE removed", "TEST_SUITE found");
+assert(!html.includes("checklistNotes"), "Unused checklistNotes state removed", "checklistNotes found");
+assert(!html.includes("(.xlsx)") && html.includes("(Google Sheets)"), "Google Sheets link labeled as Google Sheets", "still labeled .xlsx");
+assert(!/Ordinance No\. 426M60000010037/.test(html), "Ordinance cited by number, not e-Gov ID", "426M60000010037 used as ordinance number");
 
 console.log(`\n=== FINAL VERIFICATION SUMMARY: ${totalTests} TOTAL TESTS RUN, ${failedTests} FAILURES ===`);
 if (failedTests > 0) {

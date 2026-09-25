@@ -28,11 +28,12 @@ A standalone, privacy-first, 100% offline single-page web tool to audit permanen
 3. **HSP Points Calculator & J-Skip Fast Track (高度専門職ポイント計算)**
    - Category-specific calculation for Academic Research (1a), Advanced Technical/Specialist (1b), and Business Management (1c).
    - J-Skip evaluation engine (Track 1 academic/technical salary &ge; ¥20M; Track 2 management salary &ge; ¥40M).
-   - Dual-audit scoring system comparing application-date score vs. prior lookback score (1-year or 3-year maintenance audit).
+   - Dual-audit scoring: locks the filing-date score and checks it against the score 1 year before (80-point route) and 3 years before (70-point route).
+   - Enforces the ¥3,000,000 minimum annual salary for 1(b) and 1(c); 1(a) has no salary floor.
 
 4. **Revised PR Guidelines Assessment (Public Pension & Livelihood Standards)**
    - Simulates proposed guideline changes (April 2026 retroactive / October 2026 implementation):
-     - **Gate 1**: Household livelihood income bars scaling with household size and overseas dependents.
+     - **Gate 1**: Household income bar set by household size (overseas dependents included), with flat national statistics available as what-if alternatives.
      - **Gate 2**: Timely payment and non-delinquency standards for public pension (`厚生年金 / 国民年金`) and social health insurance (`健康保険 / 国民健康保険`).
      - Real-time asset offset calculations for savings, liquid securities, and real estate equity.
 
@@ -46,15 +47,15 @@ A standalone, privacy-first, 100% offline single-page web tool to audit permanen
 
 7. **Institutional Berkshire Hathaway Styling & Privacy**
    - Timeless, distraction-free typographic hierarchy (Times New Roman, `#800080` purple links, `#000080` navy accents, 0px border radius, 1px hairline borders).
-   - **Zero external dependencies**: No CDNs, no external tracking scripts, no fonts or frameworks fetched at runtime.
-   - **100% Client-Side**: All diagnostic states and financial numbers stay entirely in your browser (`localStorage`) with optional local file save/load.
+   - **Zero external dependencies**: No CDNs, no external tracking scripts, no fonts or frameworks fetched at runtime. The only external link is the optional master checklist on Google Sheets, which opens in a new tab.
+   - **100% Client-Side**: Checklist answers, calculator inputs and locked scores stay entirely in your browser (`localStorage`), with optional local JSON save/load.
 
 ---
 
 ## Quick Start / Offline Usage
 
 ### Option 1: Live Web App
-Open [https://farislmn.github.io/japan-pr-checklist/](https://farislmn.github.io/japan-pr-checklist/) directly in any modern desktop or mobile browser.
+Open [https://farislmn.github.io/japan-pr-checklist/](https://farislmn.github.io/japan-pr-checklist/) directly in any modern desktop or mobile browser. The repository also includes a `netlify.toml` if you prefer to deploy your own copy on Netlify.
 
 ### Option 2: Run Locally (Zero Setup)
 Clone the repository and open `index.html`:
@@ -87,10 +88,12 @@ The repository includes a Python generator script and an automated verification 
   ```bash
   node test_loop_verification.js
   ```
-  Runs 82 test cases verifying:
+  Runs 147 test cases verifying:
   - Statutory reference integrity (REF-01 through REF-22)
   - All 7 route checklists and compliance logic
-  - HSP scoring formulas, license gating, and salary brackets
+  - HSP scoring formulas, license gating, salary brackets and the ¥3M salary floor
+  - Dual-audit verdicts for the 1-year and 3-year lookbacks
+  - Saved/imported state validation and calculator input restore
   - 2026/2027 guideline reform calculations and household scaling
   - Bilingual switching and string fidelity
 
@@ -103,8 +106,10 @@ japan-pr-checklist/
 ├── index.html                 # Complete standalone, single-page web application
 ├── pr_data.json               # Master dataset (statutory refs, checklist items, translations)
 ├── generate_offline_web_app.py# Builder script that creates index.html
-├── test_loop_verification.js  # Node.js automated test runner (82 tests)
+├── test_loop_verification.js  # Node.js automated test runner (147 tests)
+├── netlify.toml               # Optional Netlify deploy config (publish root + security headers)
 ├── README.md                  # Project documentation
+├── LICENSE                    # MIT License
 └── .gitignore                 # Standard git ignores
 ```
 
