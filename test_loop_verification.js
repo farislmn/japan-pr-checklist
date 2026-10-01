@@ -384,18 +384,18 @@ vm.runInContext(`
   getEl("simBenchmark").value = "by_size";
   getEl("simHhSize").value = "5";
   getEl("simHhAbroad").value = "0";
-  getEl("simIncome").value = "850"; // 8.5M
+  getEl("simIncome").value = "1010"; // 10.1M
   getEl("simSpouseIncome").value = "0";
   getEl("simFamIncome").value = "0";
   getEl("simFamShikakugai").value = "200"; // Should be ignored!
   runReformSimulation();
-  // 5 persons requires: 7,532,000 + 800,000 = 8,332,000
-  // Qualifying income = 8.5M >= 8.332M -> PASSED
+  // 5 persons requires MHLW 第036表 5人: 10,062,000
+  // Qualifying income = 10.1M >= 10.062M -> PASSED
   detail5p = getEl("simGate1Detail").textContent;
   badge5p = getEl("simGate1Badge").textContent;
 `, ctx);
-assert(sandbox.detail5p.includes("Required Bar: 833.2万円"), "Household size 5 bar calculation (¥8.332M)", sandbox.detail5p);
-assert(sandbox.badge5p.includes("PASSED"), "Household size 5 passed with ¥8.5M", sandbox.badge5p);
+assert(sandbox.detail5p.includes("Required Bar: 1,006.2万円"), "Household size 5 bar calculation (¥10.062M)", sandbox.detail5p);
+assert(sandbox.badge5p.includes("PASSED"), "Household size 5 passed with ¥10.1M", sandbox.badge5p);
 
 // TEST 15: Language Switcher and Bilingual Verification
 vm.runInContext(`
@@ -609,8 +609,8 @@ vm.runInContext(`
 `, ctx);
 assert(sandbox.bar1.includes("Required Bar: 318.3万円"), "1-person household bar is ¥3.183M", sandbox.bar1);
 assert(sandbox.badge1.includes("PASSED"), "1-person household with ¥4M passes", sandbox.badge1);
-assert(sandbox.bar2.includes("Required Bar: 475.6万円"), "2-person household bar is ¥4.756M", sandbox.bar2);
-assert(sandbox.barAbroad.includes("Required Bar: 833.2万円") && sandbox.barAbroad.includes("5-person"), "Overseas dependents added to household size", sandbox.barAbroad);
+assert(sandbox.bar2.includes("Required Bar: 544.8万円"), "2-person household bar is ¥5.448M (MHLW 第036表)", sandbox.bar2);
+assert(sandbox.barAbroad.includes("Required Bar: 1,006.2万円") && sandbox.barAbroad.includes("5-person"), "Overseas dependents added to household size", sandbox.barAbroad);
 assert(sandbox.barFlat.includes("Required Bar: 575.2万円"), "Flat benchmark used as-is", sandbox.barFlat);
 
 // TEST 22: State validation for saved and imported backups

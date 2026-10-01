@@ -1112,7 +1112,7 @@ html_content = f'''<!DOCTYPE html>
             <div class="form-group">
               <label class="form-label" for="simBenchmark" id="labelSimBenchmark">Benchmark Survey Statistic:</label>
               <select id="simBenchmark" class="form-control" onchange="runReformSimulation()">
-                <option value="by_size" selected>By household size: MHLW average income for households of your size [Default]</option>
+                <option value="by_size" selected>By household size: MHLW 2025 survey average for your household size (318.3 / 544.8 / 784.5 / 910.1 / 1,006.2 / 1,029.4万 for 1–6+) [Default]</option>
                 <option value="kiso_all">Flat: MHLW All Households Mean (¥5,752,000)</option>
                 <option value="kiso_median">Flat: MHLW Median (¥4,510,000)</option>
                 <option value="kiso_nonelderly">Flat: MHLW Non-Elderly Households (¥7,007,000)</option>
@@ -1637,14 +1637,14 @@ html_content = f'''<!DOCTYPE html>
       if (benchSel) {{
         const curBench = benchSel.value;
         benchSel.innerHTML = isId ? `
-          <option value="by_size">Berdasarkan jumlah anggota rumah tangga: rata-rata pendapatan MHLW untuk rumah tangga seukuran Anda [Bawaan]</option>
+          <option value="by_size">Berdasarkan jumlah anggota rumah tangga: rata-rata survei MHLW 2025 untuk ukuran rumah tangga Anda (318,3 / 544,8 / 784,5 / 910,1 / 1.006,2 / 1.029,4万 untuk 1–6+) [Bawaan]</option>
           <option value="kiso_all">Tetap: Rata-rata Semua Rumah Tangga MHLW (¥5.752.000)</option>
           <option value="kiso_median">Tetap: Median MHLW (¥4.510.000)</option>
           <option value="kiso_nonelderly">Tetap: Rumah Tangga Non-Lansia MHLW (¥7.007.000)</option>
           <option value="kiso_children">Tetap: Rumah Tangga dengan Anak MHLW (¥8.573.000)</option>
           <option value="nta_wage">Tetap: Rata-rata Upah Karyawan Badan Pajak Nasional (¥4.780.000)</option>
         ` : `
-          <option value="by_size">By household size: MHLW average income for households of your size [Default]</option>
+          <option value="by_size">By household size: MHLW 2025 survey average for your household size (318.3 / 544.8 / 784.5 / 910.1 / 1,006.2 / 1,029.4万 for 1–6+) [Default]</option>
           <option value="kiso_all">Flat: MHLW All Households Mean (¥5,752,000)</option>
           <option value="kiso_median">Flat: MHLW Median (¥4,510,000)</option>
           <option value="kiso_nonelderly">Flat: MHLW Non-Elderly Households (¥7,007,000)</option>
@@ -2685,9 +2685,10 @@ html_content = f'''<!DOCTYPE html>
       kiso_children: {{ label: "MHLW Children Mean", value: 8573000 }},
       nta_wage: {{ label: "NTA Salaried Mean", value: 4780000 }}
     }};
-    // Average household income by household size (1–4 persons) and the addition per person from 5.
-    const HOUSEHOLD_SIZE_BARS = {{ 1: 3183000, 2: 4756000, 3: 6204000, 4: 7532000 }};
-    const HOUSEHOLD_EXTRA_PERSON = 800000;
+    // MHLW 2025 国民生活基礎調査 (2024 income), 所得票 第036表 「平均所得金額－平均有業人員，世帯人員別」,
+    // 1世帯当たり平均所得金額: e-Stat statInfId 000040473395. "6" is the open-ended 6人以上 class,
+    // so households of 7+ use it as a floor; the guideline's addition for 5+ has no published amount.
+    const HOUSEHOLD_SIZE_BARS = {{ 1: 3183000, 2: 5448000, 3: 7845000, 4: 9101000, 5: 10062000, 6: 10294000 }};
 
     function runReformSimulation() {{
       const isId = (currentLang === 'id');
@@ -2704,10 +2705,8 @@ html_content = f'''<!DOCTYPE html>
       let requiredIncome;
       if (benchKey in BENCHMARKS) {{
         requiredIncome = BENCHMARKS[benchKey].value;
-      }} else if (effectiveSize >= 5) {{
-        requiredIncome = HOUSEHOLD_SIZE_BARS[4] + (effectiveSize - 4) * HOUSEHOLD_EXTRA_PERSON;
       }} else {{
-        requiredIncome = HOUSEHOLD_SIZE_BARS[effectiveSize];
+        requiredIncome = HOUSEHOLD_SIZE_BARS[Math.min(effectiveSize, 6)];
       }}
 
       const applicantIncome = (+document.getElementById("simIncome").value || 0) * 10000;
