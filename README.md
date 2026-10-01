@@ -32,10 +32,10 @@ A standalone, privacy-first, 100% offline single-page web tool to audit permanen
    - Enforces the ¥3,000,000 minimum annual salary for 1(b) and 1(c); 1(a) has no salary floor.
 
 4. **Revised PR Guidelines Assessment (Public Pension & Livelihood Standards)**
-   - Simulates proposed guideline changes (April 2026 retroactive / October 2026 implementation):
-     - **Gate 1**: Household income bar set by household size (overseas dependents included), with flat national statistics available as what-if alternatives.
-     - **Gate 2**: Timely payment and non-delinquency standards for public pension (`厚生年金 / 国民年金`) and social health insurance (`健康保険 / 国民健康保険`).
-     - Real-time asset offset calculations for savings, liquid securities, and real estate equity.
+   - Simulates the final 永住許可に関するガイドライン, revised 2026-10-01 ([ISA](https://www.moj.go.jp/isa/10_00279.html)). Most provisions apply to applications from 2027-04-01; the household income level (第2の4(2)) and public-burden test (第2の5(7)) also cover applications filed from 2026-04-01 and pending on 2026-10-01:
+     - **Gate 1**: Household income bar set by household size (overseas dependents included), with flat national statistics available as what-if alternatives. Income of non-work statuses (e.g. 家族滞在) is excluded.
+     - **Gate 2**: Projected pension against 30 years of 厚生年金 at the household income level, with an asset offset for any shortfall. Applies from 2027-04-01 only.
+     - The guideline publishes no yen figures; the tool's bars and the asset-offset multiplier are estimates.
 
 5. **Statutory Reference Register & Legal Disclaimer**
    - Full statutory mapping covering 22 legal bases (`REF-01` through `REF-22`): Immigration Control Act Articles 22 and 22-2, National Pension Act Article 7, Local Tax Act, and official ministerial orders.

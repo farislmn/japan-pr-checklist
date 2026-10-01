@@ -1098,8 +1098,7 @@ html_content = f'''<!DOCTYPE html>
           Revised PR Guidelines Assessment (Public Pension &amp; Livelihood Standards)
         </div>
         <div style="font-size:13px; color:var(--text-muted); line-height:1.6;" id="simCardSubTop">
-          Based on the Ministry of Justice / ISA Draft Guideline published August 4, 2026.
-          <br>General provisions take effect on <b>April 1, 2027</b>. However, the <b>Household Income and Public Pension / Health Insurance</b> criteria are scheduled for <b>October 2026</b>, with retroactive application to applications filed up to 6 months prior (since April 1, 2026) that remain pending review at immigration!
+          Based on the final 永住許可に関するガイドライン, revised October 1, 2026 (ISA). Most provisions apply to applications filed from <b>April 1, 2027</b>. Two apply earlier: the <b>household income level</b> (第2の4(2)) and <b>not becoming a public burden</b> (第2の5(7)) also cover applications filed on or after April 1, 2026 that were still pending on October 1, 2026. The <b>pension test</b> (第2の4(3)) is <b>not</b> retroactive: it applies from April 1, 2027 only.<br>The guideline publishes no yen figures for either level. The bars below are this tool's estimates, not ISA numbers. The text is silent on applications filed between October 2, 2026 and March 31, 2027.
         </div>
       </div>
 
@@ -1142,21 +1141,21 @@ html_content = f'''<!DOCTYPE html>
               <div class="form-group">
                 <label class="form-label" for="simSpouseIncome" id="labelSimSpouseIncome">Spouse Gross Income (配偶者年収・万円):</label>
                 <input type="number" id="simSpouseIncome" class="form-control" value="0" step="10" onchange="runReformSimulation()">
-                <div class="form-desc" id="descSimSpouseIncome">Permitted if work-authorized</div>
+                <div class="form-desc" id="descSimSpouseIncome">Counts only if the spouse holds a work status (就労資格). 家族滞在 earnings under 資格外活動許可 are excluded (第2の4(2))</div>
               </div>
             </div>
 
             <div class="form-group">
               <label class="form-label" for="simFamIncome" id="labelSimFamIncome">Other Working Family Income (合算・万円):</label>
               <input type="number" id="simFamIncome" class="form-control" value="0" step="10" onchange="runReformSimulation()">
-              <div class="form-desc" id="descSimFamIncome">Permitted for family members holding independent work authorization</div>
+              <div class="form-desc" id="descSimFamIncome">Counts only for members holding a work status (就労資格)</div>
             </div>
           </div>
 
           <!-- Pension & Assets Offset -->
           <div class="card">
             <div class="card-title" id="simTitlePensionStd">Projected Pension Standard &amp; Asset Offset</div>
-            <div class="card-subtitle" id="simSubPensionStd">Projected pension must equal 30 years under Employees' Pension (厚生年金)</div>
+            <div class="card-subtitle" id="simSubPensionStd">Applications from April 1, 2027 only. Benchmark: the pension of 30 years at the household income level under Employees' Pension (厚生年金) (第2の4(3))</div>
 
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
               <div class="form-group">
@@ -1186,7 +1185,7 @@ html_content = f'''<!DOCTYPE html>
             </div>
 
             <div class="form-group">
-              <label class="form-label" for="simYcap" id="labelSimYcap">Asset Conversion Multiplier Y_cap (不足額→資産換算年数):</label>
+              <label class="form-label" for="simYcap" id="labelSimYcap">Asset Conversion Years Y_cap (tool assumption; the guideline gives no figure):</label>
               <select id="simYcap" class="form-control" onchange="runReformSimulation()">
                 <option value="25" selected>25 Years (Standard Assumption)</option>
                 <option value="20">20 Years</option>
@@ -1200,11 +1199,11 @@ html_content = f'''<!DOCTYPE html>
             <div class="card-title" id="simTitleChanges">Additional 2026 Guideline Changes</div>
             <div class="form-check">
               <input type="checkbox" id="simRefSpouse">
-              <label for="simRefSpouse" id="labelSimRefSpouse"><b>Spouse Route Requirement:</b> Married for 5+ years AND residing in Japan for 3+ years (previously 3 years marriage and 1 year residence).</label>
+              <label for="simRefSpouse" id="labelSimRefSpouse"><b>Spouse Route Requirement:</b> Married for 5+ years AND residing in Japan for 3+ years (previously 3 years marriage and 1 year residence). Applies to applications from April 1, 2027.</label>
             </div>
             <div class="form-check">
               <input type="checkbox" id="simRefLanguage">
-              <label for="simRefLanguage" id="labelSimRefLanguage"><b>Language Proficiency:</b> Japanese language capability equivalent to CEFR B1 (exemptions for Highly Skilled Professionals and graduates of Japanese universities).</label>
+              <label for="simRefLanguage" id="labelSimRefLanguage"><b>Language Proficiency:</b> Japanese at CEFR B1 or above. Not required of Highly Skilled Professionals on the HSP routes (第3の6–8) and their family, of anyone with 6+ years of Japanese primary or secondary schooling, or of a PR holder's child born in Japan whose parent has B1.</label>
             </div>
             <div class="form-check">
               <input type="checkbox" id="simRefSchool">
@@ -1212,7 +1211,19 @@ html_content = f'''<!DOCTYPE html>
             </div>
             <div class="form-check">
               <input type="checkbox" id="simRefContribution">
-              <label for="simRefContribution" id="labelSimRefContribution"><b>Contribution Guideline Abolition:</b> The separate 『我が国への貢献』 guideline is formally abolished.</label>
+              <label for="simRefContribution" id="labelSimRefContribution"><b>Contribution Guideline Abolition:</b> The separate 『我が国への貢献』 guideline is abolished; its criteria now sit in 第4 of the PR guideline.</label>
+            </div>
+            <div class="form-check">
+              <input type="checkbox" id="simRefRules">
+              <label for="simRefRules" id="labelSimRefRules"><b>Rules &amp; Systems Check:</b> Understanding of Japan's rules, centred on the 生活・就労ガイドブック, checked by a method ISA will designate (第2の5(9)).</label>
+            </div>
+            <div class="form-check">
+              <input type="checkbox" id="simRefAbsence">
+              <label for="simRefAbsence" id="labelSimRefAbsence"><b>Absences:</b> In the 10 years before filing, one trip abroad of 6+ months, or 2.5+ years abroad in total, without good reason counts against you (第2の5(6)).</label>
+            </div>
+            <div class="form-check">
+              <input type="checkbox" id="simRefMaxStay">
+              <label for="simRefMaxStay" id="labelSimRefMaxStay"><b>Longest Period of Stay:</b> A 3-year period still counts as the longest for applications filed by March 31, 2027, and after that only for a first application by someone holding 3 years on March 31, 2027 and decided before it expires (注4).</label>
             </div>
           </div>
         </div>
@@ -1617,7 +1628,7 @@ html_content = f'''<!DOCTYPE html>
 
       // Simulator Tab Static Elements
       const simTopTitle = document.getElementById("simCardTitleTop"); if (simTopTitle) simTopTitle.textContent = isId ? "Penilaian Pedoman PR Revisi (Standar Pensiun Publik & Standar Penghidupan)" : "Revised PR Guidelines Assessment (Public Pension & Livelihood Standards)";
-      const simTopSub = document.getElementById("simCardSubTop"); if (simTopSub) simTopSub.innerHTML = isId ? "Berdasarkan Rancangan Pedoman Kementerian Kehakiman / ISA yang diterbitkan pada 4 Agustus 2026.<br>Ketentuan umum mulai berlaku pada <b>1 April 2027</b>. Namun, kriteria <b>Pendapatan Rumah Tangga dan Pensiun Publik / Asuransi Kesehatan</b> dijadwalkan berlaku pada <b>Oktober 2026</b>, dengan penerapan retroaktif untuk permohonan yang diajukan hingga 6 bulan sebelumnya (sejak 1 April 2026) yang masih dalam proses pemeriksaan di imigrasi!" : "Based on the Ministry of Justice / ISA Draft Guideline published August 4, 2026.<br>General provisions take effect on <b>April 1, 2027</b>. However, the <b>Household Income and Public Pension / Health Insurance</b> criteria are scheduled for <b>October 2026</b>, with retroactive application to applications filed up to 6 months prior (since April 1, 2026) that remain pending review at immigration!";
+      const simTopSub = document.getElementById("simCardSubTop"); if (simTopSub) simTopSub.innerHTML = isId ? "Berdasarkan 永住許可に関するガイドライン final, direvisi 1 Oktober 2026 (ISA). Sebagian besar ketentuan berlaku untuk permohonan yang diajukan sejak <b>1 April 2027</b>. Dua ketentuan berlaku lebih awal: <b>tingkat pendapatan rumah tangga</b> (第2の4(2)) dan <b>tidak menjadi beban publik</b> (第2の5(7)) juga berlaku untuk permohonan yang diajukan sejak 1 April 2026 dan masih diproses pada 1 Oktober 2026. <b>Uji pensiun</b> (第2の4(3)) <b>tidak</b> berlaku surut: hanya untuk permohonan sejak 1 April 2027.<br>Pedoman tidak mencantumkan angka yen untuk kedua tingkat tersebut. Batas di bawah adalah perkiraan alat ini, bukan angka ISA. Teks pedoman tidak mengatur permohonan yang diajukan antara 2 Oktober 2026 dan 31 Maret 2027." : "Based on the final 永住許可に関するガイドライン, revised October 1, 2026 (ISA). Most provisions apply to applications filed from <b>April 1, 2027</b>. Two apply earlier: the <b>household income level</b> (第2の4(2)) and <b>not becoming a public burden</b> (第2の5(7)) also cover applications filed on or after April 1, 2026 that were still pending on October 1, 2026. The <b>pension test</b> (第2の4(3)) is <b>not</b> retroactive: it applies from April 1, 2027 only.<br>The guideline publishes no yen figures for either level. The bars below are this tool's estimates, not ISA numbers. The text is silent on applications filed between October 2, 2026 and March 31, 2027.";
 
       const simTitleInc = document.getElementById("simTitleIncomeStd"); if (simTitleInc) simTitleInc.textContent = isId ? "Standar Pendapatan Rumah Tangga" : "Household Income Standard";
       const simSubInc = document.getElementById("simSubIncomeStd"); if (simSubInc) simSubInc.textContent = isId ? "Harus terus memenuhi atau melebihi pendapatan rata-rata rumah tangga Jepang berdasarkan jumlah anggota keluarga" : "Must continuously meet or exceed the average income of Japanese households by household size";
@@ -1647,25 +1658,28 @@ html_content = f'''<!DOCTYPE html>
       const descHhAbroad = document.getElementById("descSimHhAbroad"); if (descHhAbroad) descHhAbroad.textContent = isId ? "Ditambahkan ke jumlah anggota rumah tangga (isi orang yang tinggal bersama Anda di Jumlah Anggota Rumah Tangga)" : "Added to household size (enter people living with you in Household Size)";
       const lblInc = document.getElementById("labelSimIncome"); if (lblInc) lblInc.textContent = isId ? "Pendapatan Kotor Pemohon (本人年収・万円):" : "Applicant Gross Income (本人年収・万円):";
       const lblSpouseInc = document.getElementById("labelSimSpouseIncome"); if (lblSpouseInc) lblSpouseInc.textContent = isId ? "Pendapatan Kotor Pasangan (配偶者年収・万円):" : "Spouse Gross Income (配偶者年収・万円):";
-      const descSpouseInc = document.getElementById("descSimSpouseIncome"); if (descSpouseInc) descSpouseInc.textContent = isId ? "Diizinkan jika memiliki izin kerja" : "Permitted if work-authorized";
+      const descSpouseInc = document.getElementById("descSimSpouseIncome"); if (descSpouseInc) descSpouseInc.textContent = isId ? "Dihitung hanya jika pasangan memegang status kerja (就労資格). Penghasilan 家族滞在 dengan 資格外活動許可 tidak dihitung (第2の4(2))" : "Counts only if the spouse holds a work status (就労資格). 家族滞在 earnings under 資格外活動許可 are excluded (第2の4(2))";
       const lblFamInc = document.getElementById("labelSimFamIncome"); if (lblFamInc) lblFamInc.textContent = isId ? "Pendapatan Anggota Keluarga Lain yang Bekerja (合算・万円):" : "Other Working Family Income (合算・万円):";
-      const descFamInc = document.getElementById("descSimFamIncome"); if (descFamInc) descFamInc.textContent = isId ? "Diizinkan untuk anggota keluarga yang memegang izin kerja mandiri" : "Permitted for family members holding independent work authorization";
+      const descFamInc = document.getElementById("descSimFamIncome"); if (descFamInc) descFamInc.textContent = isId ? "Dihitung hanya untuk anggota yang memegang status kerja (就労資格)" : "Counts only for members holding a work status (就労資格)";
 
       const simTitlePen = document.getElementById("simTitlePensionStd"); if (simTitlePen) simTitlePen.textContent = isId ? "Standar Proyeksi Pensiun & Kompensasi Aset" : "Projected Pension Standard & Asset Offset";
-      const simSubPen = document.getElementById("simSubPensionStd"); if (simSubPen) simSubPen.textContent = isId ? "Proyeksi pensiun harus setara dengan 30 tahun kepesertaan Pensiun Karyawan (厚生年金)" : "Projected pension must equal 30 years under Employees' Pension (厚生年金)";
+      const simSubPen = document.getElementById("simSubPensionStd"); if (simSubPen) simSubPen.textContent = isId ? "Hanya untuk permohonan sejak 1 April 2027. Tolok ukur: pensiun 30 tahun pada tingkat pendapatan rumah tangga di Pensiun Karyawan (厚生年金) (第2の4(3))" : "Applications from April 1, 2027 only. Benchmark: the pension of 30 years at the household income level under Employees' Pension (厚生年金) (第2の4(3))";
       const lblAge = document.getElementById("labelSimAge"); if (lblAge) lblAge.textContent = isId ? "Usia Saat Ini (現在の年齢):" : "Current Age (現在の年齢):";
       const lblEndAge = document.getElementById("labelSimEndAge"); if (lblEndAge) lblEndAge.textContent = isId ? "Usia Pensiun / Selesai Bekerja (就労予定年齢):" : "Retirement / Work End Age (就労予定年齢):";
       const lblPastKosei = document.getElementById("labelSimPastKosei"); if (lblPastKosei) lblPastKosei.textContent = isId ? "Masa Kepesertaan Pensiun Karyawan Sebelumnya (厚生年金年数):" : "Past Employees' Pension (厚生年金年数):";
       const lblPastKokumin = document.getElementById("labelSimPastKokumin"); if (lblPastKokumin) lblPastKokumin.textContent = isId ? "Masa Kepesertaan Pensiun Nasional Saja Sebelumnya (国民年金年数):" : "Past National Pension Only (国民年金年数):";
       const lblTeikibin = document.getElementById("labelSimTeikibin"); if (lblTeikibin) lblTeikibin.textContent = isId ? "Bagian Akumulasi Nenkin Teikibin Opsional (ねんきん定期便 報酬比例見込額・万円/年):" : "Optional Nenkin Teikibin Accrued Portion (ねんきん定期便 報酬比例見込額・万円/年):";
       const teikibinInput = document.getElementById("simTeikibin"); if (teikibinInput) teikibinInput.placeholder = isId ? "Biarkan kosong untuk memperkirakan otomatis dari gaji saat ini" : "Leave blank to auto-estimate from current salary";
-      const lblYcap = document.getElementById("labelSimYcap"); if (lblYcap) lblYcap.textContent = isId ? "Pengali Konversi Aset Y_cap (不足額→資産換算年数):" : "Asset Conversion Multiplier Y_cap (不足額→資産換算年数):";
+      const lblYcap = document.getElementById("labelSimYcap"); if (lblYcap) lblYcap.textContent = isId ? "Tahun Konversi Aset Y_cap (asumsi alat; pedoman tidak memberi angka):" : "Asset Conversion Years Y_cap (tool assumption; the guideline gives no figure):";
 
       const simTitleChg = document.getElementById("simTitleChanges"); if (simTitleChg) simTitleChg.textContent = isId ? "Perubahan Tambahan Pedoman 2026" : "Additional 2026 Guideline Changes";
-      const lblRefSpouse = document.getElementById("labelSimRefSpouse"); if (lblRefSpouse) lblRefSpouse.innerHTML = isId ? "<b>Persyaratan Jalur Pasangan:</b> Menikah selama 5+ tahun DAN tinggal di Jepang selama 3+ tahun (sebelumnya 3 tahun pernikahan dan 1 tahun tinggal)." : "<b>Spouse Route Requirement:</b> Married for 5+ years AND residing in Japan for 3+ years (previously 3 years marriage and 1 year residence).";
-      const lblRefLang = document.getElementById("labelSimRefLanguage"); if (lblRefLang) lblRefLang.innerHTML = isId ? "<b>Kemahiran Bahasa:</b> Kemampuan bahasa Jepang setara dengan CEFR B1 (pengecualian untuk Tenaga Kerja Ahli Tingkat Lanjut / HSP dan lulusan universitas Jepang)." : "<b>Language Proficiency:</b> Japanese language capability equivalent to CEFR B1 (exemptions for Highly Skilled Professionals and graduates of Japanese universities).";
+      const lblRefSpouse = document.getElementById("labelSimRefSpouse"); if (lblRefSpouse) lblRefSpouse.innerHTML = isId ? "<b>Persyaratan Jalur Pasangan:</b> Menikah selama 5+ tahun DAN tinggal di Jepang selama 3+ tahun (sebelumnya 3 tahun pernikahan dan 1 tahun tinggal). Berlaku untuk permohonan sejak 1 April 2027." : "<b>Spouse Route Requirement:</b> Married for 5+ years AND residing in Japan for 3+ years (previously 3 years marriage and 1 year residence). Applies to applications from April 1, 2027.";
+      const lblRefLang = document.getElementById("labelSimRefLanguage"); if (lblRefLang) lblRefLang.innerHTML = isId ? "<b>Kemahiran Bahasa:</b> Bahasa Jepang setara CEFR B1 atau lebih. Tidak disyaratkan bagi Tenaga Kerja Ahli Tingkat Lanjut pada jalur HSP (第3の6–8) dan keluarganya, bagi yang menempuh 6+ tahun pendidikan dasar atau menengah di Jepang, atau bagi anak pemegang PR yang lahir di Jepang dengan orang tua ber-B1." : "<b>Language Proficiency:</b> Japanese at CEFR B1 or above. Not required of Highly Skilled Professionals on the HSP routes (第3の6–8) and their family, of anyone with 6+ years of Japanese primary or secondary schooling, or of a PR holder's child born in Japan whose parent has B1.";
       const lblRefSchool = document.getElementById("labelSimRefSchool"); if (lblRefSchool) lblRefSchool.innerHTML = isId ? "<b>Pendidikan Anak:</b> Anak usia sekolah yang tinggal di Jepang terdaftar di sekolah dasar atau sekolah menengah pertama." : "<b>Child Education:</b> School-age children living in Japan are enrolled in elementary or junior high school.";
-      const lblRefContrib = document.getElementById("labelSimRefContribution"); if (lblRefContrib) lblRefContrib.innerHTML = isId ? "<b>Penghapusan Pedoman Kontribusi:</b> Pedoman terpisah 『我が国への貢献』 (Kontribusi terhadap Jepang) secara resmi dihapuskan." : "<b>Contribution Guideline Abolition:</b> The separate 『我が国への貢献』 guideline is formally abolished.";
+      const lblRefContrib = document.getElementById("labelSimRefContribution"); if (lblRefContrib) lblRefContrib.innerHTML = isId ? "<b>Penghapusan Pedoman Kontribusi:</b> Pedoman terpisah 『我が国への貢献』 dihapus; kriterianya kini ada di 第4 pedoman PR." : "<b>Contribution Guideline Abolition:</b> The separate 『我が国への貢献』 guideline is abolished; its criteria now sit in 第4 of the PR guideline.";
+      {{ const el = document.getElementById("labelSimRefRules"); if (el) el.innerHTML = isId ? "<b>Pemeriksaan Aturan &amp; Sistem:</b> Pemahaman aturan Jepang, berpusat pada 生活・就労ガイドブック, diperiksa dengan metode yang akan ditetapkan ISA (第2の5(9))." : "<b>Rules &amp; Systems Check:</b> Understanding of Japan's rules, centred on the 生活・就労ガイドブック, checked by a method ISA will designate (第2の5(9))."; }}
+      {{ const el = document.getElementById("labelSimRefAbsence"); if (el) el.innerHTML = isId ? "<b>Ketidakhadiran:</b> Dalam 10 tahun sebelum pengajuan, satu kali ke luar negeri 6+ bulan, atau total 2,5+ tahun di luar negeri, tanpa alasan wajar dinilai negatif (第2の5(6))." : "<b>Absences:</b> In the 10 years before filing, one trip abroad of 6+ months, or 2.5+ years abroad in total, without good reason counts against you (第2の5(6))."; }}
+      {{ const el = document.getElementById("labelSimRefMaxStay"); if (el) el.innerHTML = isId ? "<b>Masa Tinggal Terpanjang:</b> Masa tinggal 3 tahun tetap dianggap terpanjang untuk permohonan hingga 31 Maret 2027; setelahnya hanya untuk permohonan pertama oleh pemegang masa 3 tahun per 31 Maret 2027 yang diputus sebelum masa itu habis (注4)." : "<b>Longest Period of Stay:</b> A 3-year period still counts as the longest for applications filed by March 31, 2027, and after that only for a first application by someone holding 3 years on March 31, 2027 and decided before it expires (注4)."; }}
 
       const simTitleRes = document.getElementById("simTitleResults"); if (simTitleRes) simTitleRes.textContent = isId ? "HASIL SIMULASI" : "SIMULATION RESULTS";
       const simLblIncEval = document.getElementById("simLblIncomeEval"); if (simLblIncEval) simLblIncEval.textContent = isId ? "EVALUASI PENDAPATAN RUMAH TANGGA" : "HOUSEHOLD INCOME EVALUATION";
@@ -1841,7 +1855,7 @@ html_content = f'''<!DOCTYPE html>
               <li><b>Undang-Undang Pengawasan Imigrasi dan Pengakuan Pengungsi (出入国管理及び難民認定法 / UU No. 319 Tahun 1951)</b> — Pasal 22 (Izin Tinggal Tetap), Pasal 7-2, dan Pasal 22-4 (Pencabutan Status Izin Tinggal).</li>
               <li><b>Peraturan Menteri tentang Standar Tenaga Kerja Ahli Tingkat Lanjut (高度専門職省令 / Peraturan Kementerian Kehakiman No. 37 Tahun 2014, ID hukum e-Gov 426M60000010037)</b> — Kriteria resmi evaluasi poin untuk Kategori 1(a), 1(b), 1(c), dan ketentuan J-Skip.</li>
               <li><b>Pedoman Pemberian Izin Tinggal Tetap (永住許可に関するガイドライン)</b> — Bagian 1 (Persyaratan Hukum: Kelakuan Baik, Kemandirian Ekonomi, Kepentingan Nasional), Bagian 2 (Pengecualian Khusus untuk Pasangan, Penduduk Jangka Panjang, HSP, dan J-Skip).</li>
-              <li><b>e-Gov Konsultasi Publik Kabinet Perkara No. 315000140 (e-Gov パブリックコメント案件番号 315000140)</b> — Usulan revisi Pedoman Izin Tinggal Tetap terkait tolok ukur penghidupan rumah tangga, kecukupan 30 tahun pensiun publik, dan kompensasi aset.</li>
+              <li><b>永住許可に関するガイドライン (revisi 1 Oktober 2026)</b> — tingkat pendapatan rumah tangga (第2の4(2)), tingkat pensiun dan kompensasi aset (第2の4(3)), beban publik (第2の5(7)), bahasa Jepang B1, pemeriksaan aturan, ketidakhadiran; ketentuan peralihan di 第6. https://www.moj.go.jp/isa/10_00279.html</li><li><b>永住者の在留資格の取消しに関するガイドライン (1 Oktober 2026; berlaku operasional sejak 1 April 2027)</b> — pencabutan PR karena sengaja tidak membayar pajak dan iuran jaminan sosial, serta pelanggaran kewajiban UU Imigrasi. https://www.moj.go.jp/isa/11_00118.html</li><li><b>e-Gov Konsultasi Publik No. 315000140</b> — rancangan Agustus 2026; hanya latar belakang, digantikan oleh teks final.</li>
               <li><b>Undang-Undang Asuransi Kesehatan &amp; Pensiun Publik (国民健康保険法・健康保険法・国民年金法・厚生年金保険法)</b> — Dasar hukum untuk verifikasi ketat kepatuhan pembayaran tepat waktu sebelum jatuh tempo.</li>
             </ul>
           `;
@@ -1867,7 +1881,7 @@ html_content = f'''<!DOCTYPE html>
               <li><b>Immigration Control and Refugee Recognition Act (出入国管理及び難民認定法 / Act No. 319 of 1951)</b> — Article 22 (Permission for Permanent Residence), Article 7-2, and Article 22-4 (Revocation of Status of Residence).</li>
               <li><b>Ministerial Ordinance on Standards for Highly Skilled Professionals (高度専門職省令 / Ministry of Justice Ordinance No. 37 of 2014, e-Gov law ID 426M60000010037)</b> — Official point evaluation criteria for Categories 1(a), 1(b), 1(c), and J-Skip provisions.</li>
               <li><b>Guidelines for Permission for Permanent Residence (永住許可に関するガイドライン)</b> — Section 1 (Statutory Requirements: Good Conduct, Independent Livelihood, National Interest), Section 2 (Special Exceptions for Spouses, Long-Term Residents, HSPs, and J-Skip).</li>
-              <li><b>Cabinet e-Gov Public Comment Case No. 315000140 (e-Gov パブリックコメント案件番号 315000140)</b> — Proposed revisions to the Permanent Residency Guidelines regarding household livelihood benchmarks, 30-year public pension adequacy, and asset offsets.</li>
+              <li><b>永住許可に関するガイドライン (revised October 1, 2026)</b> — household income level (第2の4(2)), pension level and asset offset (第2の4(3)), public burden (第2の5(7)), B1 Japanese, rules check, absences; transition rules in 第6. https://www.moj.go.jp/isa/10_00279.html</li><li><b>永住者の在留資格の取消しに関するガイドライン (October 1, 2026; in operation from April 1, 2027)</b> — revocation of PR for wilful non-payment of taxes and social insurance, and breach of Immigration Act duties. https://www.moj.go.jp/isa/11_00118.html</li><li><b>Cabinet e-Gov Public Comment Case No. 315000140</b> — the August 2026 draft of the revision; background only, superseded by the final text.</li>
               <li><b>Public Health Insurance &amp; Pension Acts (国民健康保険法・健康保険法・国民年金法・厚生年金保険法)</b> — Statutory basis for strict on-time payment compliance verification.</li>
             </ul>
           `;
